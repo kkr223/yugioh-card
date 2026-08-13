@@ -703,7 +703,9 @@ export class LegacyYugiohCardRenderer extends Card {
     }
 
     const suffix = this.data.type === 'pendulum' ? '-pendulum' : '';
-    const rareUrl = this.data.rare ? `${this.baseImage}/rare-${this.data.rare}${suffix}.png` : '';
+    const rareUrl = this.data.rare === 'o'
+      ? `${this.baseImage}/card-bleed-rainbow.png`
+      : (this.data.rare ? `${this.baseImage}/rare-${this.data.rare}${suffix}.png` : '');
 
     this.rareLeaf.set({
       url: rareUrl,

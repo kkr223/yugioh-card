@@ -147,6 +147,43 @@ test('renders optional out-frame resources from document switches', async () => 
   card.destroy();
 });
 
+test('renders out-frame rarity with independently optional effect-box border', async () => {
+  const card = new YugiohCard({
+    resourcePath,
+    skia,
+    data: {
+      rare: 'o',
+      foregroundImage: 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==',
+      foregroundWidth: 100,
+      foregroundHeight: 100,
+      effectBlockBorder: false,
+      scale: 0.1,
+    },
+  });
+
+  await card.whenReady();
+  const internals = card as unknown as {
+    rareLeaf: { visible?: boolean; url?: string; zIndex?: number };
+    foregroundLeaf: { visible?: boolean; zIndex?: number };
+    effectBoxBorderLeaf: { visible?: boolean; url?: string; zIndex?: number };
+  };
+
+  assert.equal(Boolean(internals.rareLeaf.visible), true);
+  assert.match(String(internals.rareLeaf.url), /card-bleed-rainbow\.png$/);
+  assert.equal(internals.foregroundLeaf.visible, true);
+  assert.equal(internals.effectBoxBorderLeaf.visible, false);
+
+  card.setData({ effectBlockBorder: true });
+  await card.whenReady();
+
+  assert.match(String(internals.effectBoxBorderLeaf.url), /eblock-border-o\.png$/);
+  assert.equal(internals.effectBoxBorderLeaf.visible, true);
+  assert.ok(
+    Number(internals.effectBoxBorderLeaf.zIndex) > Number(internals.foregroundLeaf.zIndex),
+  );
+  card.destroy();
+});
+
 test('foreground can avoid covering level, rank and link-marker overlays', async () => {
   const card = new YugiohCard({
     resourcePath,
