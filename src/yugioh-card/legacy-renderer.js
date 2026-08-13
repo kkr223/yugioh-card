@@ -576,7 +576,7 @@ var h = class extends t {
 	}
 	drawRare() {
 		this.rareLeaf || (this.rareLeaf = new f(), this.leafer.add(this.rareLeaf));
-		let e = this.data.type === "pendulum" ? "-pendulum" : "", t = this.data.rare ? `${this.baseImage}/rare-${this.data.rare}${e}.png` : "";
+		let e = this.data.type === "pendulum" ? "-pendulum" : "", t = this.data.rare === "o" ? `${this.baseImage}/card-bleed-rainbow.png` : this.data.rare ? `${this.baseImage}/rare-${this.data.rare}${e}.png` : "";
 		this.rareLeaf.set({
 			url: t,
 			cornerRadius: this.data.radius ? 24 : 0,

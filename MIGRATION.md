@@ -76,7 +76,7 @@ await card.updateDocument(document => ({
   },
   effectBox: {
     ...document.effectBox,
-    borderStyle: 'colored', // 'none' | 'default' | 'colored'
+    borderStyle: 'default', // 'none' hides the effect-box border
   },
   foreground: {
     ...document.foreground,
@@ -84,15 +84,18 @@ await card.updateDocument(document => ({
   },
   footer: {
     ...document.footer,
+    rare: 'o', // out-frame rarity
     mark25th: true,
   },
 }));
 ```
 
-Legacy flat data can use `nameBlock`, `effectBlockBorderStyle`, and `mark25th`.
-`effectBlockBorderStyle: 'default'` uses `eblock-border.png`; `'colored'` uses
-`eblock-border-o.png`. Use `foregroundCoverLevel: false` when the foreground
-image should stay behind level, rank, and link-marker overlays.
+Legacy flat data can use `nameBlock`, `rare: 'o'`, `effectBlockBorder`, and
+`mark25th`. The out-frame rarity uses `card-bleed-rainbow.png`; enabling
+`effectBlockBorder` adds `eblock-border-o.png` above the foreground. The old
+`effectBlockBorderStyle: 'colored'` value remains supported for compatibility.
+Use `foregroundCoverLevel: false` when the foreground image should stay behind
+level, rank, and link-marker overlays.
 
 Pendulum cards with a visible foreground automatically split the pendulum mask:
 `card-mask-pendulum-art.png` stays below the foreground, while

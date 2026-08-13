@@ -65,6 +65,7 @@ export declare class YugiohCard extends LegacyYugiohCardRenderer {
     private drawTitleShadow;
     private drawNameBlock;
     private drawForeground;
+    private applyForegroundTitlePolicy;
     private applyForegroundLevelPolicy;
     private drawEffectBox;
     private drawMark25th;

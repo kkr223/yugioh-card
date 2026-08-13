@@ -240,7 +240,7 @@ var _ = class extends o {
 	}
 	async renderRevision(e) {
 		let t = i(this.documentValue), n = a(t);
-		this.applyRarityTitlePreset(n), this.data = n, super.draw(), this.applyArtworkFit(t), this.drawPendulumSplitMask(t), this.drawNameBlock(t), this.drawTitleShadow(t), this.drawForeground(t), this.applyForegroundLevelPolicy(t), this.drawEffectBox(t), this.drawMark25th(t);
+		this.applyRarityTitlePreset(n), this.data = n, super.draw(), this.applyArtworkFit(t), this.drawPendulumSplitMask(t), this.drawNameBlock(t), this.drawTitleShadow(t), this.drawForeground(t), this.applyForegroundTitlePolicy(), this.applyForegroundLevelPolicy(t), this.drawEffectBox(t), this.drawMark25th(t);
 		let r = h(t);
 		for (let { extension: t, group: n } of this.extensions.values()) {
 			let i = t.update({
@@ -333,7 +333,7 @@ var _ = class extends o {
 			height: n.height,
 			x: (n.x ?? 0) + r.offsetX,
 			y: (n.y ?? 0) + r.offsetY,
-			zIndex: 9,
+			zIndex: 22,
 			visible: n.visible !== !1,
 			opacity: r.opacity,
 			scaleX: n.scaleX,
@@ -381,6 +381,9 @@ var _ = class extends o {
 			zIndex: 21
 		});
 	}
+	applyForegroundTitlePolicy() {
+		this.nameLeaf?.set({ zIndex: 23 });
+	}
 	applyForegroundLevelPolicy(e) {
 		let t = this, n = e.foreground.coverLevel ? 10 : 22;
 		t.levelLeaf?.set({ zIndex: n }), t.rankLeaf?.set({ zIndex: n });
@@ -401,7 +404,7 @@ var _ = class extends o {
 			visible: n,
 			zIndex: 28
 		});
-		let s = t.borderStyle === "colored" ? p.effectBox.coloredUrl : p.effectBox.defaultUrl;
+		let s = e.footer.rare.trim().toLowerCase() === "o" || t.borderStyle === "colored" ? p.effectBox.coloredUrl : p.effectBox.defaultUrl;
 		this.effectBoxBorderLeaf.set({
 			url: this.resourceUrl(s),
 			x: t.x,
