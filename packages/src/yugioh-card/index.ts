@@ -687,8 +687,7 @@ export class YugiohCard extends LegacyYugiohCardRenderer {
       visible: fillVisible,
       zIndex: 28,
     });
-    const borderUrl = document.footer.rare.trim().toLowerCase() === 'o'
-      || effectBox.borderStyle === 'colored'
+    const borderUrl = effectBox.borderStyle === 'colored'
       ? OUT_FRAME_LAYOUT.effectBox.coloredUrl
       : OUT_FRAME_LAYOUT.effectBox.defaultUrl;
     this.effectBoxBorderLeaf.set({

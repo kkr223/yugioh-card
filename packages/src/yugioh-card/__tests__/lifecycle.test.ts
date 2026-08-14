@@ -176,6 +176,12 @@ test('renders out-frame rarity with independently optional effect-box border', a
   card.setData({ effectBlockBorder: true });
   await card.whenReady();
 
+  assert.match(String(internals.effectBoxBorderLeaf.url), /eblock-border\.png$/);
+  assert.equal(internals.effectBoxBorderLeaf.visible, true);
+
+  card.setData({ effectBlockBorderStyle: 'colored' });
+  await card.whenReady();
+
   assert.match(String(internals.effectBoxBorderLeaf.url), /eblock-border-o\.png$/);
   assert.equal(internals.effectBoxBorderLeaf.visible, true);
   assert.ok(
