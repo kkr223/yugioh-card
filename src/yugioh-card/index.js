@@ -100,15 +100,25 @@ var u = class extends Error {
 		width: 1257,
 		height: 681
 	}
-};
-function h(e) {
+}, h = [
+	"name",
+	"pendulumDescription",
+	"monsterType",
+	"description",
+	"package",
+	"password"
+];
+function g(e) {
+	if (!(e.language !== "sc" && e.language !== "tc")) for (let t of h) e[t] = e[t].replace(/[０-９]/g, (e) => String.fromCharCode(e.charCodeAt(0) - 65248));
+}
+function _(e) {
 	let t = i(e);
 	return Object.freeze(t.frame.arrows), Object.freeze(t.frame), Object.freeze(t.title.fill), Object.freeze(t.title.shadow), Object.freeze(t.title), Object.freeze(t.artwork), Object.freeze(t.foreground), Object.freeze(t.effectBox), Object.freeze(t.text), Object.freeze(t.footer), Object.freeze(t.render), Object.freeze(t);
 }
-function g(e) {
+function v(e) {
 	return typeof e == "object" && !!e && "then" in e && typeof e.then == "function";
 }
-var _ = class extends o {
+var y = class extends o {
 	documentValue;
 	revisionValue = 0;
 	completedRevision = 0;
@@ -149,7 +159,7 @@ var _ = class extends o {
 		await this.setDocument(e(this.getDocument()));
 	}
 	getDocument() {
-		return h(this.documentValue ?? n());
+		return _(this.documentValue ?? n());
 	}
 	registerExtension(e) {
 		if (this.assertActive(), !t.includes(e.slot)) throw Error(`Unknown YugiohCard layer slot: ${String(e.slot)}`);
@@ -240,8 +250,8 @@ var _ = class extends o {
 	}
 	async renderRevision(e) {
 		let t = i(this.documentValue), n = a(t);
-		this.applyRarityTitlePreset(n), this.data = n, super.draw(), this.applyArtworkFit(t), this.drawPendulumSplitMask(t), this.drawNameBlock(t), this.drawTitleShadow(t), this.drawForeground(t), this.applyForegroundTitlePolicy(), this.applyForegroundLevelPolicy(t), this.drawEffectBox(t), this.drawMark25th(t);
-		let r = h(t);
+		g(n), this.applyRarityTitlePreset(n), this.data = n, super.draw(), this.applyArtworkFit(t), this.drawPendulumSplitMask(t), this.drawNameBlock(t), this.drawTitleShadow(t), this.drawForeground(t), this.applyForegroundTitlePolicy(), this.applyForegroundLevelPolicy(t), this.drawEffectBox(t), this.drawMark25th(t);
+		let r = _(t);
 		for (let { extension: t, group: n } of this.extensions.values()) {
 			let i = t.update({
 				group: n,
@@ -251,7 +261,7 @@ var _ = class extends o {
 					this.scheduleRender();
 				}
 			});
-			if (g(i) && await i, e !== this.revisionValue) return;
+			if (v(i) && await i, e !== this.revisionValue) return;
 		}
 	}
 	applyRarityTitlePreset(e) {
@@ -441,4 +451,4 @@ var _ = class extends o {
 	}
 };
 //#endregion
-export { _ as YugiohCard, u as YugiohCardRenderError };
+export { y as YugiohCard, u as YugiohCardRenderError };

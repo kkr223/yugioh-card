@@ -581,7 +581,7 @@ var h = class extends t {
 			url: t,
 			cornerRadius: this.data.radius ? 24 : 0,
 			visible: this.data.rare,
-			zIndex: 100
+			zIndex: this.data.rare === "o" ? 20.5 : 100
 		});
 	}
 	drawAttributeRare() {
