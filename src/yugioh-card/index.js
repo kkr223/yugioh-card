@@ -404,7 +404,7 @@ var _ = class extends o {
 			visible: n,
 			zIndex: 28
 		});
-		let s = e.footer.rare.trim().toLowerCase() === "o" || t.borderStyle === "colored" ? p.effectBox.coloredUrl : p.effectBox.defaultUrl;
+		let s = t.borderStyle === "colored" ? p.effectBox.coloredUrl : p.effectBox.defaultUrl;
 		this.effectBoxBorderLeaf.set({
 			url: this.resourceUrl(s),
 			x: t.x,
