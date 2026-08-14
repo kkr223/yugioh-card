@@ -171,6 +171,7 @@ test('renders out-frame rarity with independently optional effect-box border', a
   assert.equal(Boolean(internals.rareLeaf.visible), true);
   assert.match(String(internals.rareLeaf.url), /card-bleed-rainbow\.png$/);
   assert.equal(internals.foregroundLeaf.visible, true);
+  assert.ok(Number(internals.rareLeaf.zIndex) < Number(internals.foregroundLeaf.zIndex));
   assert.equal(internals.effectBoxBorderLeaf.visible, false);
 
   card.setData({ effectBlockBorder: true });
@@ -187,6 +188,34 @@ test('renders out-frame rarity with independently optional effect-box border', a
   assert.ok(
     Number(internals.effectBoxBorderLeaf.zIndex) > Number(internals.foregroundLeaf.zIndex),
   );
+  card.destroy();
+});
+
+test('renders Chinese text with half-width digits', async () => {
+  const card = new YugiohCard({
+    resourcePath,
+    skia,
+    data: {
+      language: 'sc',
+      name: '测试１２３',
+      cardType: 'effect',
+      monsterType: '龙族／效果２',
+      description: '１回合只能发动２次。',
+      scale: 0.1,
+    },
+  });
+
+  await card.whenReady();
+  const internals = card as unknown as {
+    nameLeaf: { text?: string };
+    effectLeaf: { text?: string };
+    descriptionLeaf: { text?: string };
+  };
+
+  assert.equal(internals.nameLeaf.text, '测试123');
+  assert.equal(internals.effectLeaf.text, '【龙族／效果2】');
+  assert.equal(internals.descriptionLeaf.text, '1回合只能发动2次。');
+  assert.equal(card.getDocument().title.text, '测试１２３');
   card.destroy();
 });
 

@@ -711,7 +711,7 @@ export class LegacyYugiohCardRenderer extends Card {
       url: rareUrl,
       cornerRadius: this.data.radius ? 24 : 0,
       visible: this.data.rare,
-      zIndex: 100,
+      zIndex: this.data.rare === 'o' ? 20.5 : 100,
     });
   }
 

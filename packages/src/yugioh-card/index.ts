@@ -186,6 +186,27 @@ const MASK_LAYOUT = {
   },
 } as const;
 
+const CHINESE_TEXT_FIELDS = [
+  'name',
+  'pendulumDescription',
+  'monsterType',
+  'description',
+  'package',
+  'password',
+] as const;
+
+function normalizeChineseDigits(data: Required<LegacyYugiohCardData>): void {
+  if (data.language !== 'sc' && data.language !== 'tc') {
+    return;
+  }
+  for (const field of CHINESE_TEXT_FIELDS) {
+    data[field] = data[field].replace(
+      /[０-９]/g,
+      digit => String.fromCharCode(digit.charCodeAt(0) - 0xFEE0),
+    );
+  }
+}
+
 function readonlyDocument(document: YugiohCardDocument): Readonly<YugiohCardDocument> {
   const clone = parseYugiohCardDocument(document);
   Object.freeze(clone.frame.arrows);
@@ -430,6 +451,7 @@ export class YugiohCard extends LegacyYugiohCardRenderer {
   private async renderRevision(revision: number): Promise<void> {
     const document = parseYugiohCardDocument(this.documentValue);
     const data = yugiohCardDocumentToLegacyData(document);
+    normalizeChineseDigits(data);
     this.applyRarityTitlePreset(data);
     this.data = data as unknown as typeof this.data;
     super.draw();
