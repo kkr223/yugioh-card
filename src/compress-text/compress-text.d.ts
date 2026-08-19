@@ -15,6 +15,7 @@ export interface CompressTextData {
     color: string;
     strokeWidth: number;
     gradient: boolean;
+    gradientStroke: boolean;
     gradientColor1: string;
     gradientColor2: string;
     rtFontFamily: string;
@@ -59,6 +60,7 @@ export declare class CompressText extends LegacyCompressText {
     color: string;
     strokeWidth: number;
     gradient: boolean;
+    gradientStroke: boolean;
     gradientColor1: string;
     gradientColor2: string;
     rtFontFamily: string;

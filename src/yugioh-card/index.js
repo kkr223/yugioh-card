@@ -376,7 +376,7 @@ var b = class extends o {
 		let t = e.foreground, n = this.foregroundVisible(e);
 		this.foregroundClipBox.set({
 			width: this.cardWidth,
-			height: Math.max(0, e.effectBox.y),
+			height: Math.max(0, e.effectBox.y + e.effectBox.height),
 			overflow: t.clipBelowEffectBox ? "hide" : "show",
 			visible: n,
 			zIndex: 21

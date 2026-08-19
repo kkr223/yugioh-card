@@ -40,6 +40,7 @@ export interface YugiohCardDocument {
         fill: {
             color: string;
             gradient: boolean;
+            gradientStroke: boolean;
             gradientColor1: string;
             gradientColor2: string;
         };
@@ -115,6 +116,7 @@ export interface LegacyYugiohCardData {
     color?: string;
     align?: string;
     gradient?: boolean;
+    gradientStroke?: boolean;
     gradientColor1?: string;
     gradientColor2?: string;
     nameShadowColor?: string;

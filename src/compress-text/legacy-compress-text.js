@@ -24,6 +24,7 @@ var i = /(\[[^\[\]()]*\([^\[\]()]*\)])/g, a = /^\[([^\[\]()]+)\(([^\[\]()]*)\)]$
 			color: "black",
 			strokeWidth: 0,
 			gradient: !1,
+			gradientStroke: !0,
 			gradientColor1: "#999999",
 			gradientColor2: "#ffffff",
 			rtFontFamily: "ygo-tip",
@@ -434,8 +435,8 @@ var i = /(\[[^\[\]()]*\([^\[\]()]*\)])/g, a = /^\[([^\[\]()]+)\(([^\[\]()]*)\)]$
 							}
 						]
 					},
-					stroke: h,
-					strokeWidth: e * g * this.fontScale,
+					stroke: this.gradientStroke ? h : null,
+					strokeWidth: this.gradientStroke ? e * g * this.fontScale : 0,
 					strokeAlign: "outside",
 					shadow: {
 						blur: e * _ * this.fontScale,

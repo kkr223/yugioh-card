@@ -76,6 +76,7 @@ var e = "yugioh-card", t = 1, n = [
 		fill: {
 			color: "",
 			gradient: !1,
+			gradientStroke: !0,
 			gradientColor1: "#999999",
 			gradientColor2: "#ffffff"
 		},
@@ -277,6 +278,7 @@ function S(t) {
 			fill: {
 				color: _(f.color, "title.fill.color"),
 				gradient: y(f.gradient, "title.fill.gradient"),
+				gradientStroke: x(f.gradientStroke, !0, "title.fill.gradientStroke"),
 				gradientColor1: _(f.gradientColor1, "title.fill.gradientColor1"),
 				gradientColor2: _(f.gradientColor2, "title.fill.gradientColor2")
 			},
@@ -388,6 +390,7 @@ function O(e = {}, t = p()) {
 			fill: {
 				color: C(e.color, t.title.fill.color),
 				gradient: T(e.gradient, t.title.fill.gradient),
+				gradientStroke: T(e.gradientStroke, t.title.fill.gradientStroke),
 				gradientColor1: C(e.gradientColor1, t.title.fill.gradientColor1),
 				gradientColor2: C(e.gradientColor2, t.title.fill.gradientColor2)
 			},
@@ -466,6 +469,7 @@ function k(e) {
 		color: t.title.fill.color,
 		align: t.title.align,
 		gradient: t.title.fill.gradient,
+		gradientStroke: t.title.fill.gradientStroke,
 		gradientColor1: t.title.fill.gradientColor1,
 		gradientColor2: t.title.fill.gradientColor2,
 		nameShadowColor: t.title.shadow.color,

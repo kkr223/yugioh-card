@@ -34,6 +34,7 @@ export class LegacyCompressText extends Group<import('leafer-unified').IGroupInp
         color: string;
         strokeWidth: number;
         gradient: boolean;
+        gradientStroke: boolean;
         gradientColor1: string;
         gradientColor2: string;
         rtFontFamily: string;
