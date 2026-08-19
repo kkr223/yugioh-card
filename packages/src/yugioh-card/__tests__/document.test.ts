@@ -14,6 +14,7 @@ test('creates independent default documents', () => {
 
   first.frame.arrows.push(1);
   assert.deepEqual(second.frame.arrows, []);
+  assert.equal(second.title.fill.gradientStroke, true);
   assert.equal(second.foreground.clipBelowEffectBox, false);
 });
 
@@ -21,6 +22,8 @@ test('maps legacy data to a structured document and back', () => {
   const document = legacyDataToYugiohCardDocument({
     language: 'jp',
     name: 'テスト',
+    gradient: true,
+    gradientStroke: false,
     type: 'pendulum',
     pendulumType: 'xyz-pendulum',
     arrowList: [1, 9, 3],
@@ -42,6 +45,7 @@ test('maps legacy data to a structured document and back', () => {
   assert.equal(document.frame.language, 'jp');
   assert.deepEqual(document.frame.arrows, [1, 3]);
   assert.equal(document.title.shadow.enabled, true);
+  assert.equal(document.title.fill.gradientStroke, false);
   assert.equal(document.frame.nameBlock, true);
   assert.equal(document.foreground.enabled, true);
   assert.equal(document.foreground.coverLevel, false);
@@ -53,6 +57,7 @@ test('maps legacy data to a structured document and back', () => {
 
   const legacy = yugiohCardDocumentToLegacyData(document);
   assert.equal(legacy.name, 'テスト');
+  assert.equal(legacy.gradientStroke, false);
   assert.equal(legacy.nameBlock, true);
   assert.equal(legacy.foregroundImage, 'foreground.png');
   assert.equal(legacy.foregroundCoverLevel, false);

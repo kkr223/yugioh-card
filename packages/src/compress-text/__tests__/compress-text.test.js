@@ -418,6 +418,22 @@ test('CompressText gradient styling is applied to ruby leaves', () => {
   assert.equal(rubyLeaf.shadow.color, 'rgba(0, 0, 0, 0.6)');
 });
 
+test('CompressText gradient stroke can be disabled', () => {
+  const instance = new NewCompressText({
+    ...baseConfig,
+    text: '[魔(ま)][法(ほう)]カード',
+    width: 220,
+    gradient: true,
+    gradientStroke: false,
+  });
+  const rubyLeaf = instance.rubyList[0].rubyLeaf;
+
+  assert.equal(rubyLeaf.stroke, null);
+  assert.equal(rubyLeaf.strokeWidth, 0);
+  assert.equal(rubyLeaf.fill.type, 'linear');
+  assert.equal(rubyLeaf.shadow.color, 'rgba(0, 0, 0, 0.6)');
+});
+
 test('CompressText updates ruby padding when rt is much wider than ruby', () => {
   const instance = new NewCompressText({
     ...baseConfig,

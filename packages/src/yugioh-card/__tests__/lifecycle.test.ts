@@ -219,7 +219,7 @@ test('renders Chinese text with half-width digits', async () => {
   card.destroy();
 });
 
-test('foreground can be clipped above the effect box', async () => {
+test('foreground can be clipped at the bottom edge of the effect box', async () => {
   const card = new YugiohCard({
     resourcePath,
     skia,
@@ -231,7 +231,7 @@ test('foreground can be clipped above the effect box', async () => {
         height: 100,
         clipBelowEffectBox: true,
       },
-      effectBox: { y: 1400 },
+      effectBox: { y: 1400, height: 400 },
       render: { scale: 0.1 },
     }),
   });
@@ -240,7 +240,7 @@ test('foreground can be clipped above the effect box', async () => {
   const internals = card as unknown as {
     foregroundClipBox: { height?: number; overflow?: string };
   };
-  assert.equal(internals.foregroundClipBox.height, 1400);
+  assert.equal(internals.foregroundClipBox.height, 1800);
   assert.equal(internals.foregroundClipBox.overflow, 'hide');
 
   await card.updateDocument(document => ({

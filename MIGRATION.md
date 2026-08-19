@@ -99,7 +99,7 @@ Legacy flat data can use `nameBlock`, `rare: 'o'`, `effectBlockBorder`, and
 Use `foregroundCoverLevel: false` when the foreground image should stay behind
 level, rank, and link-marker overlays. Use `foregroundCoverAttribute: false`
 when it should also stay behind the attribute icon. Use
-`foregroundClipBelowEffectBox: true` to hide foreground pixels below the top
+`foregroundClipBelowEffectBox: true` to hide foreground pixels below the bottom
 edge of the effect box.
 
 Pendulum cards with a visible foreground automatically split the pendulum mask:

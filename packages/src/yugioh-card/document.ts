@@ -75,6 +75,7 @@ export interface YugiohCardDocument {
     fill: {
       color: string;
       gradient: boolean;
+      gradientStroke: boolean;
       gradientColor1: string;
       gradientColor2: string;
     };
@@ -151,6 +152,7 @@ export interface LegacyYugiohCardData {
   color?: string;
   align?: string;
   gradient?: boolean;
+  gradientStroke?: boolean;
   gradientColor1?: string;
   gradientColor2?: string;
   nameShadowColor?: string;
@@ -257,6 +259,7 @@ const DEFAULT_DOCUMENT: YugiohCardDocument = {
     fill: {
       color: '',
       gradient: false,
+      gradientStroke: true,
       gradientColor1: '#999999',
       gradientColor2: '#ffffff',
     },
@@ -492,6 +495,11 @@ export function parseYugiohCardDocument(value: unknown): YugiohCardDocument {
       fill: {
         color: stringAt(fill.color, 'title.fill.color'),
         gradient: booleanAt(fill.gradient, 'title.fill.gradient'),
+        gradientStroke: optionalBooleanAt(
+          fill.gradientStroke,
+          true,
+          'title.fill.gradientStroke',
+        ),
         gradientColor1: stringAt(fill.gradientColor1, 'title.fill.gradientColor1'),
         gradientColor2: stringAt(fill.gradientColor2, 'title.fill.gradientColor2'),
       },
@@ -674,6 +682,10 @@ export function legacyDataToYugiohCardDocument(
       fill: {
         color: stringValue(data.color, base.title.fill.color),
         gradient: booleanValue(data.gradient, base.title.fill.gradient),
+        gradientStroke: booleanValue(
+          data.gradientStroke,
+          base.title.fill.gradientStroke,
+        ),
         gradientColor1: stringValue(
           data.gradientColor1,
           base.title.fill.gradientColor1,
@@ -801,6 +813,7 @@ export function yugiohCardDocumentToLegacyData(
     color: value.title.fill.color,
     align: value.title.align,
     gradient: value.title.fill.gradient,
+    gradientStroke: value.title.fill.gradientStroke,
     gradientColor1: value.title.fill.gradientColor1,
     gradientColor2: value.title.fill.gradientColor2,
     nameShadowColor: value.title.shadow.color,

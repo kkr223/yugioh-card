@@ -139,6 +139,7 @@ export class LegacyYugiohCardRenderer extends Card {
       textAlign: this.data.align || 'left',
       color: this.data.color || this.autoNameColor,
       gradient: this.data.gradient,
+      gradientStroke: this.data.gradientStroke,
       gradientColor1: this.data.gradientColor1,
       gradientColor2: this.data.gradientColor2,
       rtFontSize: name.rtFontSize,

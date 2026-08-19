@@ -652,7 +652,7 @@ export class YugiohCard extends LegacyYugiohCardRenderer {
     const visible = this.foregroundVisible(document);
     this.foregroundClipBox.set({
       width: this.cardWidth,
-      height: Math.max(0, document.effectBox.y),
+      height: Math.max(0, document.effectBox.y + document.effectBox.height),
       overflow: foreground.clipBelowEffectBox ? 'hide' : 'show',
       visible,
       zIndex: 21,

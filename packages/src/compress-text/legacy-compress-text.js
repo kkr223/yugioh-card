@@ -72,6 +72,7 @@ export class LegacyCompressText extends Group {
       color: 'black',
       strokeWidth: 0,
       gradient: false,
+      gradientStroke: true,
       gradientColor1: '#999999',
       gradientColor2: '#ffffff',
       rtFontFamily: 'ygo-tip',
@@ -1252,8 +1253,10 @@ export class LegacyCompressText extends Group {
               { offset: gradientStops[4], color: this.gradientColor2 },
             ],
           },
-          stroke: gradientStrokeColor,
-          strokeWidth: fontSize * gradientStrokeWidthRate * this.fontScale,
+          stroke: this.gradientStroke ? gradientStrokeColor : null,
+          strokeWidth: this.gradientStroke
+            ? fontSize * gradientStrokeWidthRate * this.fontScale
+            : 0,
           strokeAlign: 'outside',
           shadow: {
             blur: fontSize * gradientShadowBlurRate * this.fontScale,
