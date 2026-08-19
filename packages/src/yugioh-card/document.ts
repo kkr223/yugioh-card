@@ -104,6 +104,8 @@ export interface YugiohCardDocument {
     scale: number;
     rotation: number;
     coverLevel: boolean;
+    coverAttribute: boolean;
+    clipBelowEffectBox: boolean;
   };
   effectBox: {
     enabled: boolean;
@@ -199,6 +201,8 @@ export interface LegacyYugiohCardData {
   foregroundScale?: number;
   foregroundRotation?: number;
   foregroundCoverLevel?: boolean;
+  foregroundCoverAttribute?: boolean;
+  foregroundClipBelowEffectBox?: boolean;
   effectBlockEnabled?: boolean;
   effectBlockX?: number;
   effectBlockY?: number;
@@ -282,6 +286,8 @@ const DEFAULT_DOCUMENT: YugiohCardDocument = {
     scale: 1,
     rotation: 0,
     coverLevel: true,
+    coverAttribute: true,
+    clipBelowEffectBox: false,
   },
   effectBox: {
     enabled: false,
@@ -525,6 +531,16 @@ export function parseYugiohCardDocument(value: unknown): YugiohCardDocument {
         true,
         'foreground.coverLevel',
       ),
+      coverAttribute: optionalBooleanAt(
+        foreground.coverAttribute,
+        true,
+        'foreground.coverAttribute',
+      ),
+      clipBelowEffectBox: optionalBooleanAt(
+        foreground.clipBelowEffectBox,
+        false,
+        'foreground.clipBelowEffectBox',
+      ),
     },
     effectBox: {
       enabled: booleanAt(effectBox.enabled, 'effectBox.enabled'),
@@ -712,6 +728,14 @@ export function legacyDataToYugiohCardDocument(
         data.foregroundCoverLevel,
         base.foreground.coverLevel,
       ),
+      coverAttribute: booleanValue(
+        data.foregroundCoverAttribute,
+        base.foreground.coverAttribute,
+      ),
+      clipBelowEffectBox: booleanValue(
+        data.foregroundClipBelowEffectBox,
+        base.foreground.clipBelowEffectBox,
+      ),
     },
     effectBox: {
       enabled: booleanValue(data.effectBlockEnabled, base.effectBox.enabled),
@@ -829,6 +853,8 @@ export function yugiohCardDocumentToLegacyData(
     foregroundScale: value.foreground.scale,
     foregroundRotation: value.foreground.rotation,
     foregroundCoverLevel: value.foreground.coverLevel,
+    foregroundCoverAttribute: value.foreground.coverAttribute,
+    foregroundClipBelowEffectBox: value.foreground.clipBelowEffectBox,
     effectBlockEnabled: value.effectBox.enabled,
     effectBlockX: value.effectBox.x,
     effectBlockY: value.effectBox.y,

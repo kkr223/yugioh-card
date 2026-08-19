@@ -81,6 +81,8 @@ await card.updateDocument(document => ({
   foreground: {
     ...document.foreground,
     coverLevel: false,
+    coverAttribute: false,
+    clipBelowEffectBox: true,
   },
   footer: {
     ...document.footer,
@@ -95,7 +97,10 @@ Legacy flat data can use `nameBlock`, `rare: 'o'`, `effectBlockBorder`, and
 `effectBlockBorder` adds `eblock-border-o.png` above the foreground. The old
 `effectBlockBorderStyle: 'colored'` value remains supported for compatibility.
 Use `foregroundCoverLevel: false` when the foreground image should stay behind
-level, rank, and link-marker overlays.
+level, rank, and link-marker overlays. Use `foregroundCoverAttribute: false`
+when it should also stay behind the attribute icon. Use
+`foregroundClipBelowEffectBox: true` to hide foreground pixels below the top
+edge of the effect box.
 
 Pendulum cards with a visible foreground automatically split the pendulum mask:
 `card-mask-pendulum-art.png` stays below the foreground, while

@@ -219,7 +219,39 @@ test('renders Chinese text with half-width digits', async () => {
   card.destroy();
 });
 
-test('foreground can avoid covering level, rank and link-marker overlays', async () => {
+test('foreground can be clipped above the effect box', async () => {
+  const card = new YugiohCard({
+    resourcePath,
+    skia,
+    document: createYugiohCardDocument({
+      foreground: {
+        enabled: true,
+        source: 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==',
+        width: 100,
+        height: 100,
+        clipBelowEffectBox: true,
+      },
+      effectBox: { y: 1400 },
+      render: { scale: 0.1 },
+    }),
+  });
+
+  await card.whenReady();
+  const internals = card as unknown as {
+    foregroundClipBox: { height?: number; overflow?: string };
+  };
+  assert.equal(internals.foregroundClipBox.height, 1400);
+  assert.equal(internals.foregroundClipBox.overflow, 'hide');
+
+  await card.updateDocument(document => ({
+    ...document,
+    foreground: { ...document.foreground, clipBelowEffectBox: false },
+  }));
+  assert.equal(internals.foregroundClipBox.overflow, 'show');
+  card.destroy();
+});
+
+test('foreground can avoid covering level, rank, attribute and link-marker overlays', async () => {
   const card = new YugiohCard({
     resourcePath,
     skia,
@@ -235,6 +267,7 @@ test('foreground can avoid covering level, rank and link-marker overlays', async
         width: 100,
         height: 100,
         coverLevel: false,
+        coverAttribute: false,
       },
       render: { scale: 0.1 },
     }),
@@ -244,11 +277,13 @@ test('foreground can avoid covering level, rank and link-marker overlays', async
   const internals = card as unknown as {
     foregroundLeaf: { zIndex?: number };
     nameLeaf: { zIndex?: number };
+    attributeLeaf: { zIndex?: number };
     levelLeaf: { zIndex?: number };
     rankLeaf: { zIndex?: number };
     linkArrowLeaf: { zIndex?: number };
   };
   assert.ok(Number(internals.nameLeaf.zIndex) > Number(internals.foregroundLeaf.zIndex));
+  assert.ok(Number(internals.attributeLeaf.zIndex) > Number(internals.foregroundLeaf.zIndex));
   assert.ok(Number(internals.levelLeaf.zIndex) > Number(internals.foregroundLeaf.zIndex));
   assert.ok(Number(internals.rankLeaf.zIndex) > Number(internals.foregroundLeaf.zIndex));
   assert.ok(Number(internals.linkArrowLeaf.zIndex) > Number(internals.foregroundLeaf.zIndex));
@@ -258,11 +293,13 @@ test('foreground can avoid covering level, rank and link-marker overlays', async
     foreground: {
       ...document.foreground,
       coverLevel: true,
+      coverAttribute: true,
     },
   }));
 
   assert.equal(internals.levelLeaf.zIndex, 10);
   assert.equal(internals.rankLeaf.zIndex, 10);
+  assert.equal(internals.attributeLeaf.zIndex, 10);
   assert.ok(Number(internals.linkArrowLeaf.zIndex) < Number(internals.foregroundLeaf.zIndex));
   card.destroy();
 });

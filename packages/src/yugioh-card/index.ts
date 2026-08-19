@@ -1,4 +1,4 @@
-import { Group, Image, Rect } from 'leafer-unified';
+import { Box, Group, Image, Rect } from 'leafer-unified';
 import { CompressText } from '../compress-text/index.ts';
 import {
   createYugiohCardDocument,
@@ -77,6 +77,7 @@ type CompressTextView = {
 
 type LegacyRendererShape = {
   nameLeaf?: CompressTextView | null;
+  attributeLeaf?: Image | null;
   imageLeaf?: Rect | null;
   maskLeaf?: Image | null;
   levelLeaf?: Group | null;
@@ -241,6 +242,7 @@ export class YugiohCard extends LegacyYugiohCardRenderer {
   private slotGroups = new Map<YugiohCardLayerSlot, Group>();
   private nameBlockLeaf: Image | null = null;
   private titleShadowLeaf: CompressText | null = null;
+  private foregroundClipBox: Box | null = null;
   private foregroundLeaf: Image | null = null;
   private pendulumEffectMaskLeaf: Image | null = null;
   private effectBoxFillLeaf: Rect | null = null;
@@ -369,6 +371,7 @@ export class YugiohCard extends LegacyYugiohCardRenderer {
     }
     this.nameBlockLeaf = null;
     this.titleShadowLeaf = null;
+    this.foregroundClipBox = null;
     this.foregroundLeaf = null;
     this.pendulumEffectMaskLeaf = null;
     this.effectBoxFillLeaf = null;
@@ -461,7 +464,7 @@ export class YugiohCard extends LegacyYugiohCardRenderer {
     this.drawTitleShadow(document);
     this.drawForeground(document);
     this.applyForegroundTitlePolicy();
-    this.applyForegroundLevelPolicy(document);
+    this.applyForegroundOverlayPolicy(document);
     this.drawEffectBox(document);
     this.drawMark25th(document);
 
@@ -637,12 +640,23 @@ export class YugiohCard extends LegacyYugiohCardRenderer {
     if (!this.leafer) {
       return;
     }
+    if (!this.foregroundClipBox) {
+      this.foregroundClipBox = new Box();
+      this.leafer.add(this.foregroundClipBox);
+    }
     if (!this.foregroundLeaf) {
       this.foregroundLeaf = new Image();
-      this.leafer.add(this.foregroundLeaf);
+      this.foregroundClipBox.add(this.foregroundLeaf);
     }
     const foreground = document.foreground;
     const visible = this.foregroundVisible(document);
+    this.foregroundClipBox.set({
+      width: this.cardWidth,
+      height: Math.max(0, document.effectBox.y),
+      overflow: foreground.clipBelowEffectBox ? 'hide' : 'show',
+      visible,
+      zIndex: 21,
+    });
     this.foregroundLeaf.set({
       url: foreground.source,
       width: foreground.width,
@@ -663,11 +677,14 @@ export class YugiohCard extends LegacyYugiohCardRenderer {
     renderer.nameLeaf?.set({ zIndex: 23 });
   }
 
-  private applyForegroundLevelPolicy(document: YugiohCardDocument): void {
+  private applyForegroundOverlayPolicy(document: YugiohCardDocument): void {
     const renderer = this as unknown as LegacyRendererShape;
     const levelZIndex = document.foreground.coverLevel ? 10 : 22;
     renderer.levelLeaf?.set({ zIndex: levelZIndex });
     renderer.rankLeaf?.set({ zIndex: levelZIndex });
+    renderer.attributeLeaf?.set({
+      zIndex: document.foreground.coverAttribute ? 10 : 22,
+    });
     const foregroundVisible = this.foregroundVisible(document);
     const linkArrowZIndex = foregroundVisible
       ? (document.foreground.coverLevel ? 20.5 : 22)
