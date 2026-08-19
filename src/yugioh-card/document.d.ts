@@ -69,6 +69,8 @@ export interface YugiohCardDocument {
         scale: number;
         rotation: number;
         coverLevel: boolean;
+        coverAttribute: boolean;
+        clipBelowEffectBox: boolean;
     };
     effectBox: {
         enabled: boolean;
@@ -163,6 +165,8 @@ export interface LegacyYugiohCardData {
     foregroundScale?: number;
     foregroundRotation?: number;
     foregroundCoverLevel?: boolean;
+    foregroundCoverAttribute?: boolean;
+    foregroundClipBelowEffectBox?: boolean;
     effectBlockEnabled?: boolean;
     effectBlockX?: number;
     effectBlockY?: number;

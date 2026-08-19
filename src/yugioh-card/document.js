@@ -104,7 +104,9 @@ var e = "yugioh-card", t = 1, n = [
 		y: 1015.5,
 		scale: 1,
 		rotation: 0,
-		coverLevel: !0
+		coverLevel: !0,
+		coverAttribute: !0,
+		clipBelowEffectBox: !1
 	},
 	effectBox: {
 		enabled: !1,
@@ -303,7 +305,9 @@ function S(t) {
 			y: v(C.y, "foreground.y"),
 			scale: v(C.scale, "foreground.scale"),
 			rotation: v(C.rotation, "foreground.rotation"),
-			coverLevel: x(C.coverLevel, !0, "foreground.coverLevel")
+			coverLevel: x(C.coverLevel, !0, "foreground.coverLevel"),
+			coverAttribute: x(C.coverAttribute, !0, "foreground.coverAttribute"),
+			clipBelowEffectBox: x(C.clipBelowEffectBox, !1, "foreground.clipBelowEffectBox")
 		},
 		effectBox: {
 			enabled: y(w.enabled, "effectBox.enabled"),
@@ -412,7 +416,9 @@ function O(e = {}, t = p()) {
 			y: w(e.foregroundY, t.foreground.y),
 			scale: w(e.foregroundScale, t.foreground.scale),
 			rotation: w(e.foregroundRotation, t.foreground.rotation),
-			coverLevel: T(e.foregroundCoverLevel, t.foreground.coverLevel)
+			coverLevel: T(e.foregroundCoverLevel, t.foreground.coverLevel),
+			coverAttribute: T(e.foregroundCoverAttribute, t.foreground.coverAttribute),
+			clipBelowEffectBox: T(e.foregroundClipBelowEffectBox, t.foreground.clipBelowEffectBox)
 		},
 		effectBox: {
 			enabled: T(e.effectBlockEnabled, t.effectBox.enabled),
@@ -512,6 +518,8 @@ function k(e) {
 		foregroundScale: t.foreground.scale,
 		foregroundRotation: t.foreground.rotation,
 		foregroundCoverLevel: t.foreground.coverLevel,
+		foregroundCoverAttribute: t.foreground.coverAttribute,
+		foregroundClipBelowEffectBox: t.foreground.clipBelowEffectBox,
 		effectBlockEnabled: t.effectBox.enabled,
 		effectBlockX: t.effectBox.x,
 		effectBlockY: t.effectBox.y,

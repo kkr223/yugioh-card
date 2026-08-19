@@ -34,6 +34,7 @@ export declare class YugiohCard extends LegacyYugiohCardRenderer {
     private slotGroups;
     private nameBlockLeaf;
     private titleShadowLeaf;
+    private foregroundClipBox;
     private foregroundLeaf;
     private pendulumEffectMaskLeaf;
     private effectBoxFillLeaf;
@@ -66,7 +67,7 @@ export declare class YugiohCard extends LegacyYugiohCardRenderer {
     private drawNameBlock;
     private drawForeground;
     private applyForegroundTitlePolicy;
-    private applyForegroundLevelPolicy;
+    private applyForegroundOverlayPolicy;
     private drawEffectBox;
     private drawMark25th;
     private resolveWaiters;
