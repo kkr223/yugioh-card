@@ -191,6 +191,70 @@ test('renders out-frame rarity with independently optional effect-box border', a
   card.destroy();
 });
 
+test('renders pser2 through an adjustable grayscale rarity mask', async () => {
+  const maskSource = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==';
+  const card = new YugiohCard({
+    resourcePath,
+    skia,
+    data: {
+      type: 'pendulum',
+      rare: 'pser2',
+      rarityMaskImage: maskSource,
+      rarityMaskWidth: 200,
+      rarityMaskHeight: 300,
+      rarityMaskX: 640,
+      rarityMaskY: 900,
+      rarityMaskScale: 1.5,
+      scale: 0.1,
+    },
+  });
+
+  await card.whenReady();
+  const internals = card as unknown as {
+    rareLeaf: { url?: string; zIndex?: number; parent?: unknown };
+    rarityMaskLayer: { visible?: boolean; zIndex?: number };
+    rarityMaskShape: { mask?: string };
+    rarityMaskLeaf: {
+      url?: string;
+      x?: number;
+      y?: number;
+      width?: number;
+      height?: number;
+      scaleX?: number;
+    };
+    rarityEffectBoxMaskLeaf: {
+      visible?: boolean;
+      x?: number;
+      y?: number;
+      width?: number;
+      height?: number;
+    };
+  };
+
+  assert.match(String(internals.rareLeaf.url), /rare-pser2\.png$/);
+  assert.equal(internals.rareLeaf.zIndex, 0);
+  assert.equal(internals.rarityMaskLayer.visible, true);
+  assert.equal(internals.rarityMaskLayer.zIndex, 100);
+  assert.equal(internals.rarityMaskShape.mask, 'grayscale');
+  assert.equal(internals.rarityMaskLeaf.url, maskSource);
+  assert.equal(internals.rarityMaskLeaf.x, 640);
+  assert.equal(internals.rarityMaskLeaf.y, 900);
+  assert.equal(internals.rarityMaskLeaf.width, 200);
+  assert.equal(internals.rarityMaskLeaf.height, 300);
+  assert.equal(internals.rarityMaskLeaf.scaleX, 1.5);
+  assert.equal(internals.rarityEffectBoxMaskLeaf.visible, true);
+  assert.equal(internals.rarityEffectBoxMaskLeaf.x, 93);
+  assert.equal(internals.rarityEffectBoxMaskLeaf.y, 1517);
+  assert.equal(internals.rarityEffectBoxMaskLeaf.width, 1207);
+  assert.equal(internals.rarityEffectBoxMaskLeaf.height, 391);
+
+  card.setData({ rarityMaskImage: '', rarityMaskEffectBox: false });
+  await card.whenReady();
+  assert.equal(internals.rarityMaskLayer.visible, false);
+  assert.equal(internals.rareLeaf.zIndex, 100);
+  card.destroy();
+});
+
 test('renders Chinese text with half-width digits', async () => {
   const card = new YugiohCard({
     resourcePath,

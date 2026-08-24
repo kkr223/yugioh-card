@@ -108,6 +108,15 @@ export interface YugiohCardDocument {
     coverAttribute: boolean;
     clipBelowEffectBox: boolean;
   };
+  rarityMask: {
+    source: string;
+    width: number;
+    height: number;
+    x: number;
+    y: number;
+    scale: number;
+    maskEffectBox: boolean;
+  };
   effectBox: {
     enabled: boolean;
     x: number;
@@ -205,6 +214,13 @@ export interface LegacyYugiohCardData {
   foregroundCoverLevel?: boolean;
   foregroundCoverAttribute?: boolean;
   foregroundClipBelowEffectBox?: boolean;
+  rarityMaskImage?: string;
+  rarityMaskWidth?: number;
+  rarityMaskHeight?: number;
+  rarityMaskX?: number;
+  rarityMaskY?: number;
+  rarityMaskScale?: number;
+  rarityMaskEffectBox?: boolean;
   effectBlockEnabled?: boolean;
   effectBlockX?: number;
   effectBlockY?: number;
@@ -292,6 +308,15 @@ const DEFAULT_DOCUMENT: YugiohCardDocument = {
     coverAttribute: true,
     clipBelowEffectBox: false,
   },
+  rarityMask: {
+    source: '',
+    width: 0,
+    height: 0,
+    x: 697,
+    y: 1015.5,
+    scale: 1,
+    maskEffectBox: true,
+  },
   effectBox: {
     enabled: false,
     x: 77,
@@ -340,6 +365,7 @@ function cloneDocument(document: YugiohCardDocument): YugiohCardDocument {
     },
     artwork: { ...document.artwork },
     foreground: { ...document.foreground },
+    rarityMask: { ...document.rarityMask },
     effectBox: { ...document.effectBox },
     text: { ...document.text },
     footer: { ...document.footer },
@@ -369,6 +395,7 @@ export function createYugiohCardDocument(
     },
     artwork: { ...document.artwork, ...input.artwork },
     foreground: { ...document.foreground, ...input.foreground },
+    rarityMask: { ...document.rarityMask, ...input.rarityMask },
     effectBox: { ...document.effectBox, ...input.effectBox },
     text: { ...document.text, ...input.text },
     footer: { ...document.footer, ...input.footer },
@@ -459,6 +486,9 @@ export function parseYugiohCardDocument(value: unknown): YugiohCardDocument {
   const shadow = recordAt(title, 'shadow');
   const artwork = recordAt(value, 'artwork');
   const foreground = recordAt(value, 'foreground');
+  const rarityMask = value.rarityMask === undefined
+    ? DEFAULT_DOCUMENT.rarityMask
+    : recordAt(value, 'rarityMask');
   const effectBox = recordAt(value, 'effectBox');
   const text = recordAt(value, 'text');
   const footer = recordAt(value, 'footer');
@@ -548,6 +578,19 @@ export function parseYugiohCardDocument(value: unknown): YugiohCardDocument {
         foreground.clipBelowEffectBox,
         false,
         'foreground.clipBelowEffectBox',
+      ),
+    },
+    rarityMask: {
+      source: stringAt(rarityMask.source, 'rarityMask.source'),
+      width: numberAt(rarityMask.width, 'rarityMask.width'),
+      height: numberAt(rarityMask.height, 'rarityMask.height'),
+      x: numberAt(rarityMask.x, 'rarityMask.x'),
+      y: numberAt(rarityMask.y, 'rarityMask.y'),
+      scale: numberAt(rarityMask.scale, 'rarityMask.scale'),
+      maskEffectBox: optionalBooleanAt(
+        rarityMask.maskEffectBox,
+        true,
+        'rarityMask.maskEffectBox',
       ),
     },
     effectBox: {
@@ -647,6 +690,7 @@ export function legacyDataToYugiohCardDocument(
 ): YugiohCardDocument {
   const shadowColor = stringValue(data.nameShadowColor, base.title.shadow.color);
   const foregroundSource = stringValue(data.foregroundImage, base.foreground.source);
+  const rarityMaskSource = stringValue(data.rarityMaskImage, base.rarityMask.source);
   const arrows = Array.isArray(data.arrowList)
     ? data.arrowList.filter(
       (arrow): arrow is YugiohLinkArrow =>
@@ -747,6 +791,18 @@ export function legacyDataToYugiohCardDocument(
       clipBelowEffectBox: booleanValue(
         data.foregroundClipBelowEffectBox,
         base.foreground.clipBelowEffectBox,
+      ),
+    },
+    rarityMask: {
+      source: rarityMaskSource,
+      width: numberValue(data.rarityMaskWidth, base.rarityMask.width),
+      height: numberValue(data.rarityMaskHeight, base.rarityMask.height),
+      x: numberValue(data.rarityMaskX, base.rarityMask.x),
+      y: numberValue(data.rarityMaskY, base.rarityMask.y),
+      scale: numberValue(data.rarityMaskScale, base.rarityMask.scale),
+      maskEffectBox: booleanValue(
+        data.rarityMaskEffectBox,
+        base.rarityMask.maskEffectBox,
       ),
     },
     effectBox: {
@@ -868,6 +924,13 @@ export function yugiohCardDocumentToLegacyData(
     foregroundCoverLevel: value.foreground.coverLevel,
     foregroundCoverAttribute: value.foreground.coverAttribute,
     foregroundClipBelowEffectBox: value.foreground.clipBelowEffectBox,
+    rarityMaskImage: value.rarityMask.source,
+    rarityMaskWidth: value.rarityMask.width,
+    rarityMaskHeight: value.rarityMask.height,
+    rarityMaskX: value.rarityMask.x,
+    rarityMaskY: value.rarityMask.y,
+    rarityMaskScale: value.rarityMask.scale,
+    rarityMaskEffectBox: value.rarityMask.maskEffectBox,
     effectBlockEnabled: value.effectBox.enabled,
     effectBlockX: value.effectBox.x,
     effectBlockY: value.effectBox.y,

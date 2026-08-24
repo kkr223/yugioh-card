@@ -703,7 +703,9 @@ export class LegacyYugiohCardRenderer extends Card {
       this.leafer.add(this.rareLeaf);
     }
 
-    const suffix = this.data.type === 'pendulum' ? '-pendulum' : '';
+    const suffix = this.data.type === 'pendulum' && this.data.rare !== 'pser2'
+      ? '-pendulum'
+      : '';
     const rareUrl = this.data.rare === 'o'
       ? `${this.baseImage}/card-bleed-rainbow.png`
       : (this.data.rare ? `${this.baseImage}/rare-${this.data.rare}${suffix}.png` : '');
@@ -871,7 +873,7 @@ export class LegacyYugiohCardRenderer extends Card {
   }
 
   get showAttributeRare() {
-    return this.showAttribute && ['hr', 'ser', 'gser', 'pser'].includes(this.data.rare);
+    return this.showAttribute && ['hr', 'ser', 'gser', 'pser', 'pser2'].includes(this.data.rare);
   }
 
   get showLevel() {

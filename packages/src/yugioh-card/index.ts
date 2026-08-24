@@ -83,6 +83,7 @@ type LegacyRendererShape = {
   levelLeaf?: Group | null;
   rankLeaf?: Group | null;
   linkArrowLeaf?: Group | null;
+  rareLeaf?: Image | null;
 };
 
 const SLOT_Z_INDEX: Record<YugiohCardLayerSlot, number> = {
@@ -128,6 +129,12 @@ const RARITY_TITLE_PRESETS: Record<
     gradientColor2: '#fff1be',
   },
   pser: {
+    color: '#f5d6ef',
+    gradient: true,
+    gradientColor1: '#855f86',
+    gradientColor2: '#fff5fd',
+  },
+  pser2: {
     color: '#f5d6ef',
     gradient: true,
     gradientColor1: '#855f86',
@@ -217,6 +224,7 @@ function readonlyDocument(document: YugiohCardDocument): Readonly<YugiohCardDocu
   Object.freeze(clone.title);
   Object.freeze(clone.artwork);
   Object.freeze(clone.foreground);
+  Object.freeze(clone.rarityMask);
   Object.freeze(clone.effectBox);
   Object.freeze(clone.text);
   Object.freeze(clone.footer);
@@ -245,6 +253,11 @@ export class YugiohCard extends LegacyYugiohCardRenderer {
   private foregroundClipBox: Box | null = null;
   private foregroundLeaf: Image | null = null;
   private pendulumEffectMaskLeaf: Image | null = null;
+  private rarityMaskLayer: Group | null = null;
+  private rarityMaskShape: Group | null = null;
+  private rarityMaskBackground: Rect | null = null;
+  private rarityMaskLeaf: Image | null = null;
+  private rarityEffectBoxMaskLeaf: Rect | null = null;
   private effectBoxFillLeaf: Rect | null = null;
   private effectBoxBorderLeaf: Image | null = null;
   private mark25thLeaf: Image | null = null;
@@ -374,6 +387,11 @@ export class YugiohCard extends LegacyYugiohCardRenderer {
     this.foregroundClipBox = null;
     this.foregroundLeaf = null;
     this.pendulumEffectMaskLeaf = null;
+    this.rarityMaskLayer = null;
+    this.rarityMaskShape = null;
+    this.rarityMaskBackground = null;
+    this.rarityMaskLeaf = null;
+    this.rarityEffectBoxMaskLeaf = null;
     this.effectBoxFillLeaf = null;
     this.effectBoxBorderLeaf = null;
     this.mark25thLeaf = null;
@@ -458,6 +476,7 @@ export class YugiohCard extends LegacyYugiohCardRenderer {
     this.applyRarityTitlePreset(data);
     this.data = data as unknown as typeof this.data;
     super.draw();
+    this.drawRarityMask(document);
     this.applyArtworkFit(document);
     this.drawPendulumSplitMask(document);
     this.drawNameBlock(document);
@@ -520,6 +539,82 @@ export class YugiohCard extends LegacyYugiohCardRenderer {
       && foreground.width > 0
       && foreground.height > 0
       && foreground.scale > 0;
+  }
+
+  private drawRarityMask(document: YugiohCardDocument): void {
+    if (!this.leafer) {
+      return;
+    }
+    const renderer = this as unknown as LegacyRendererShape;
+    const rareLeaf = renderer.rareLeaf;
+    if (!rareLeaf) {
+      return;
+    }
+
+    const rarityMask = document.rarityMask;
+    const customMaskVisible = Boolean(rarityMask.source)
+      && rarityMask.width > 0
+      && rarityMask.height > 0
+      && rarityMask.scale > 0;
+    const active = Boolean(document.footer.rare)
+      && (customMaskVisible || rarityMask.maskEffectBox);
+    const rareZIndex = document.footer.rare === 'o' ? 20.5 : 100;
+
+    if (!active) {
+      this.leafer.add(rareLeaf);
+      rareLeaf.set({ zIndex: rareZIndex });
+      this.rarityMaskLayer?.set({ visible: false });
+      return;
+    }
+
+    if (!this.rarityMaskLayer) {
+      this.rarityMaskLayer = new Group();
+      this.rarityMaskShape = new Group({ mask: 'grayscale' });
+      this.rarityMaskBackground = new Rect({ fill: '#ffffff' });
+      this.rarityMaskLeaf = new Image();
+      this.rarityEffectBoxMaskLeaf = new Rect({ fill: '#000000' });
+      this.rarityMaskShape.add(this.rarityMaskBackground);
+      this.rarityMaskShape.add(this.rarityMaskLeaf);
+      this.rarityMaskShape.add(this.rarityEffectBoxMaskLeaf);
+      this.rarityMaskLayer.add(this.rarityMaskShape);
+      this.leafer.add(this.rarityMaskLayer);
+    }
+    this.rarityMaskLayer.add(rareLeaf);
+
+    this.rarityMaskLayer.set({
+      width: this.cardWidth,
+      height: this.cardHeight,
+      visible: true,
+      zIndex: rareZIndex,
+    });
+    this.rarityMaskBackground?.set({
+      width: this.cardWidth,
+      height: this.cardHeight,
+      visible: true,
+    });
+    this.rarityMaskLeaf?.set({
+      url: rarityMask.source,
+      width: rarityMask.width,
+      height: rarityMask.height,
+      x: rarityMask.x,
+      y: rarityMask.y,
+      scaleX: rarityMask.scale,
+      scaleY: rarityMask.scale,
+      around: { type: 'percent', x: 0.5, y: 0.5 },
+      visible: customMaskVisible,
+    });
+    const effectBox = document.effectBox;
+    const insetX = Math.min(16, effectBox.width / 2);
+    const insetTop = Math.min(16, effectBox.height / 2);
+    const insetBottom = Math.min(20, effectBox.height / 2);
+    this.rarityEffectBoxMaskLeaf?.set({
+      x: effectBox.x + insetX,
+      y: effectBox.y + insetTop,
+      width: Math.max(0, effectBox.width - insetX * 2),
+      height: Math.max(0, effectBox.height - insetTop - insetBottom),
+      visible: rarityMask.maskEffectBox,
+    });
+    rareLeaf.set({ zIndex: 0 });
   }
 
   private drawPendulumSplitMask(document: YugiohCardDocument): void {
