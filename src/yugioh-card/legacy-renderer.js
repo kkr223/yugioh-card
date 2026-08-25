@@ -588,7 +588,7 @@ var h = class extends t {
 			url: this.data.rare === "pser2" ? `${this.baseImage}/rare-pser-print${t}.png` : "",
 			cornerRadius: this.data.radius ? 24 : 0,
 			visible: this.data.rare === "pser2",
-			zIndex: 99.5
+			zIndex: 20.5
 		});
 	}
 	drawAttributeRare() {
