@@ -198,6 +198,8 @@ test('renders pser2 through an adjustable grayscale rarity mask', async () => {
     skia,
     data: {
       type: 'pendulum',
+      name: 'PSER 2 Name',
+      nameShadowColor: '#111111',
       rare: 'pser2',
       rarityMaskImage: maskSource,
       rarityMaskWidth: 200,
@@ -205,14 +207,22 @@ test('renders pser2 through an adjustable grayscale rarity mask', async () => {
       rarityMaskX: 640,
       rarityMaskY: 900,
       rarityMaskScale: 1.5,
+      rarityMaskArtwork: true,
       scale: 0.1,
     },
   });
 
   await card.whenReady();
   const internals = card as unknown as {
-    rareLeaf: { url?: string; zIndex?: number; parent?: unknown };
+    rareLeaf: { url?: string; zIndex?: number; blendMode?: string; parent?: unknown };
+    rarePrintLeaf: { visible?: boolean; url?: string; zIndex?: number };
     rarityMaskLayer: { visible?: boolean; zIndex?: number };
+    nameLeaf: { zIndex?: number };
+    titleShadowLeaf: { zIndex?: number };
+    attributeLeaf: { zIndex?: number };
+    levelLeaf: { zIndex?: number };
+    rankLeaf: { zIndex?: number };
+    linkArrowLeaf: { zIndex?: number };
     rarityMaskShape: { mask?: string };
     rarityMaskLeaf: {
       url?: string;
@@ -229,12 +239,29 @@ test('renders pser2 through an adjustable grayscale rarity mask', async () => {
       width?: number;
       height?: number;
     };
+    rarityArtworkMaskLeaf: {
+      visible?: boolean;
+      x?: number;
+      y?: number;
+      width?: number;
+      height?: number;
+    };
   };
 
   assert.match(String(internals.rareLeaf.url), /rare-pser2\.png$/);
   assert.equal(internals.rareLeaf.zIndex, 0);
+  assert.equal(internals.rareLeaf.blendMode, 'hard-light');
+  assert.match(String(internals.rarePrintLeaf.url), /rare-pser-print-pendulum\.png$/);
+  assert.equal(internals.rarePrintLeaf.visible, true);
+  assert.equal(internals.rarePrintLeaf.zIndex, 100.5);
   assert.equal(internals.rarityMaskLayer.visible, true);
   assert.equal(internals.rarityMaskLayer.zIndex, 100);
+  assert.equal(internals.titleShadowLeaf.zIndex, 101);
+  assert.equal(internals.nameLeaf.zIndex, 102);
+  assert.equal(internals.attributeLeaf.zIndex, 101);
+  assert.equal(internals.levelLeaf.zIndex, 101);
+  assert.equal(internals.rankLeaf.zIndex, 101);
+  assert.equal(internals.linkArrowLeaf.zIndex, 101);
   assert.equal(internals.rarityMaskShape.mask, 'grayscale');
   assert.equal(internals.rarityMaskLeaf.url, maskSource);
   assert.equal(internals.rarityMaskLeaf.x, 640);
@@ -242,16 +269,52 @@ test('renders pser2 through an adjustable grayscale rarity mask', async () => {
   assert.equal(internals.rarityMaskLeaf.width, 200);
   assert.equal(internals.rarityMaskLeaf.height, 300);
   assert.equal(internals.rarityMaskLeaf.scaleX, 1.5);
+  assert.equal(internals.rarityArtworkMaskLeaf.visible, true);
+  assert.equal(internals.rarityArtworkMaskLeaf.x, 94);
+  assert.equal(internals.rarityArtworkMaskLeaf.y, 364);
+  assert.equal(internals.rarityArtworkMaskLeaf.width, 1205);
+  assert.equal(internals.rarityArtworkMaskLeaf.height, 1205);
   assert.equal(internals.rarityEffectBoxMaskLeaf.visible, true);
   assert.equal(internals.rarityEffectBoxMaskLeaf.x, 93);
   assert.equal(internals.rarityEffectBoxMaskLeaf.y, 1517);
   assert.equal(internals.rarityEffectBoxMaskLeaf.width, 1207);
   assert.equal(internals.rarityEffectBoxMaskLeaf.height, 391);
 
-  card.setData({ rarityMaskImage: '', rarityMaskEffectBox: false });
+  const withPrint = await card.export('png', { density: 1 }) as { data: string };
+  internals.rarePrintLeaf.visible = false;
+  const withoutPrint = await card.export('png', { density: 1 }) as { data: string };
+  assert.notEqual(withPrint.data, withoutPrint.data);
+
+  card.setData({
+    rarityMaskCoverName: true,
+    rarityMaskCoverAttribute: true,
+    rarityMaskCoverLevel: true,
+  });
+  await card.whenReady();
+  assert.equal(internals.titleShadowLeaf.zIndex, 22);
+  assert.equal(internals.nameLeaf.zIndex, 23);
+  assert.equal(internals.attributeLeaf.zIndex, 10);
+  assert.equal(internals.levelLeaf.zIndex, 10);
+  assert.equal(internals.rankLeaf.zIndex, 10);
+  assert.equal(internals.linkArrowLeaf.zIndex, 22);
+
+  card.setData({
+    rarityMaskImage: '',
+    rarityMaskEffectBox: false,
+    rarityMaskArtwork: false,
+  });
   await card.whenReady();
   assert.equal(internals.rarityMaskLayer.visible, false);
   assert.equal(internals.rareLeaf.zIndex, 100);
+
+  card.setData({ rare: 'pser' });
+  await card.whenReady();
+  assert.match(String(internals.rareLeaf.url), /rare-pser-pendulum\.png$/);
+  assert.equal(internals.rarePrintLeaf.visible, false);
+
+  card.setData({ rare: '' });
+  await card.whenReady();
+  assert.equal(internals.rareLeaf.blendMode, 'pass-through');
   card.destroy();
 });
 

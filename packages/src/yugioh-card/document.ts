@@ -116,6 +116,10 @@ export interface YugiohCardDocument {
     y: number;
     scale: number;
     maskEffectBox: boolean;
+    maskArtwork: boolean;
+    coverName: boolean;
+    coverAttribute: boolean;
+    coverLevel: boolean;
   };
   effectBox: {
     enabled: boolean;
@@ -221,6 +225,10 @@ export interface LegacyYugiohCardData {
   rarityMaskY?: number;
   rarityMaskScale?: number;
   rarityMaskEffectBox?: boolean;
+  rarityMaskArtwork?: boolean;
+  rarityMaskCoverName?: boolean;
+  rarityMaskCoverAttribute?: boolean;
+  rarityMaskCoverLevel?: boolean;
   effectBlockEnabled?: boolean;
   effectBlockX?: number;
   effectBlockY?: number;
@@ -316,6 +324,10 @@ const DEFAULT_DOCUMENT: YugiohCardDocument = {
     y: 1015.5,
     scale: 1,
     maskEffectBox: true,
+    maskArtwork: false,
+    coverName: false,
+    coverAttribute: false,
+    coverLevel: false,
   },
   effectBox: {
     enabled: false,
@@ -592,6 +604,26 @@ export function parseYugiohCardDocument(value: unknown): YugiohCardDocument {
         true,
         'rarityMask.maskEffectBox',
       ),
+      maskArtwork: optionalBooleanAt(
+        rarityMask.maskArtwork,
+        false,
+        'rarityMask.maskArtwork',
+      ),
+      coverName: optionalBooleanAt(
+        rarityMask.coverName,
+        false,
+        'rarityMask.coverName',
+      ),
+      coverAttribute: optionalBooleanAt(
+        rarityMask.coverAttribute,
+        false,
+        'rarityMask.coverAttribute',
+      ),
+      coverLevel: optionalBooleanAt(
+        rarityMask.coverLevel,
+        false,
+        'rarityMask.coverLevel',
+      ),
     },
     effectBox: {
       enabled: booleanAt(effectBox.enabled, 'effectBox.enabled'),
@@ -804,6 +836,22 @@ export function legacyDataToYugiohCardDocument(
         data.rarityMaskEffectBox,
         base.rarityMask.maskEffectBox,
       ),
+      maskArtwork: booleanValue(
+        data.rarityMaskArtwork,
+        base.rarityMask.maskArtwork,
+      ),
+      coverName: booleanValue(
+        data.rarityMaskCoverName,
+        base.rarityMask.coverName,
+      ),
+      coverAttribute: booleanValue(
+        data.rarityMaskCoverAttribute,
+        base.rarityMask.coverAttribute,
+      ),
+      coverLevel: booleanValue(
+        data.rarityMaskCoverLevel,
+        base.rarityMask.coverLevel,
+      ),
     },
     effectBox: {
       enabled: booleanValue(data.effectBlockEnabled, base.effectBox.enabled),
@@ -931,6 +979,10 @@ export function yugiohCardDocumentToLegacyData(
     rarityMaskY: value.rarityMask.y,
     rarityMaskScale: value.rarityMask.scale,
     rarityMaskEffectBox: value.rarityMask.maskEffectBox,
+    rarityMaskArtwork: value.rarityMask.maskArtwork,
+    rarityMaskCoverName: value.rarityMask.coverName,
+    rarityMaskCoverAttribute: value.rarityMask.coverAttribute,
+    rarityMaskCoverLevel: value.rarityMask.coverLevel,
     effectBlockEnabled: value.effectBox.enabled,
     effectBlockX: value.effectBox.x,
     effectBlockY: value.effectBox.y,

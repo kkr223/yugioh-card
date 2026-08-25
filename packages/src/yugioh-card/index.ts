@@ -257,6 +257,7 @@ export class YugiohCard extends LegacyYugiohCardRenderer {
   private rarityMaskShape: Group | null = null;
   private rarityMaskBackground: Rect | null = null;
   private rarityMaskLeaf: Image | null = null;
+  private rarityArtworkMaskLeaf: Rect | null = null;
   private rarityEffectBoxMaskLeaf: Rect | null = null;
   private effectBoxFillLeaf: Rect | null = null;
   private effectBoxBorderLeaf: Image | null = null;
@@ -391,6 +392,7 @@ export class YugiohCard extends LegacyYugiohCardRenderer {
     this.rarityMaskShape = null;
     this.rarityMaskBackground = null;
     this.rarityMaskLeaf = null;
+    this.rarityArtworkMaskLeaf = null;
     this.rarityEffectBoxMaskLeaf = null;
     this.effectBoxFillLeaf = null;
     this.effectBoxBorderLeaf = null;
@@ -482,7 +484,7 @@ export class YugiohCard extends LegacyYugiohCardRenderer {
     this.drawNameBlock(document);
     this.drawTitleShadow(document);
     this.drawForeground(document);
-    this.applyForegroundTitlePolicy();
+    this.applyForegroundTitlePolicy(document);
     this.applyForegroundOverlayPolicy(document);
     this.drawEffectBox(document);
     this.drawMark25th(document);
@@ -557,8 +559,11 @@ export class YugiohCard extends LegacyYugiohCardRenderer {
       && rarityMask.height > 0
       && rarityMask.scale > 0;
     const active = Boolean(document.footer.rare)
-      && (customMaskVisible || rarityMask.maskEffectBox);
+      && (customMaskVisible || rarityMask.maskEffectBox || rarityMask.maskArtwork);
     const rareZIndex = document.footer.rare === 'o' ? 20.5 : 100;
+    rareLeaf.set({
+      blendMode: document.footer.rare === 'pser2' ? 'hard-light' : 'pass-through',
+    });
 
     if (!active) {
       this.leafer.add(rareLeaf);
@@ -572,9 +577,11 @@ export class YugiohCard extends LegacyYugiohCardRenderer {
       this.rarityMaskShape = new Group({ mask: 'grayscale' });
       this.rarityMaskBackground = new Rect({ fill: '#ffffff' });
       this.rarityMaskLeaf = new Image();
+      this.rarityArtworkMaskLeaf = new Rect({ fill: '#000000' });
       this.rarityEffectBoxMaskLeaf = new Rect({ fill: '#000000' });
       this.rarityMaskShape.add(this.rarityMaskBackground);
       this.rarityMaskShape.add(this.rarityMaskLeaf);
+      this.rarityMaskShape.add(this.rarityArtworkMaskLeaf);
       this.rarityMaskShape.add(this.rarityEffectBoxMaskLeaf);
       this.rarityMaskLayer.add(this.rarityMaskShape);
       this.leafer.add(this.rarityMaskLayer);
@@ -602,6 +609,13 @@ export class YugiohCard extends LegacyYugiohCardRenderer {
       scaleY: rarityMask.scale,
       around: { type: 'percent', x: 0.5, y: 0.5 },
       visible: customMaskVisible,
+    });
+    this.rarityArtworkMaskLeaf?.set({
+      x: renderer.imageLeaf?.x ?? 0,
+      y: renderer.imageLeaf?.y ?? 0,
+      width: renderer.imageLeaf?.width ?? 0,
+      height: renderer.imageLeaf?.height ?? 0,
+      visible: rarityMask.maskArtwork,
     });
     const effectBox = document.effectBox;
     const insetX = Math.min(16, effectBox.width / 2);
@@ -767,23 +781,35 @@ export class YugiohCard extends LegacyYugiohCardRenderer {
     });
   }
 
-  private applyForegroundTitlePolicy(): void {
+  private applyForegroundTitlePolicy(document: YugiohCardDocument): void {
     const renderer = this as unknown as LegacyRendererShape;
-    renderer.nameLeaf?.set({ zIndex: 23 });
+    const titleAboveRarity = document.footer.rare === 'pser2'
+      && !document.rarityMask.coverName;
+    this.titleShadowLeaf?.set({ zIndex: titleAboveRarity ? 101 : 22 });
+    renderer.nameLeaf?.set({ zIndex: titleAboveRarity ? 102 : 23 });
   }
 
   private applyForegroundOverlayPolicy(document: YugiohCardDocument): void {
     const renderer = this as unknown as LegacyRendererShape;
-    const levelZIndex = document.foreground.coverLevel ? 10 : 22;
+    const pser2 = document.footer.rare === 'pser2';
+    const levelZIndex = pser2 && !document.rarityMask.coverLevel
+      ? 101
+      : document.foreground.coverLevel ? 10 : 22;
     renderer.levelLeaf?.set({ zIndex: levelZIndex });
     renderer.rankLeaf?.set({ zIndex: levelZIndex });
     renderer.attributeLeaf?.set({
-      zIndex: document.foreground.coverAttribute ? 10 : 22,
+      zIndex: pser2 && !document.rarityMask.coverAttribute
+        ? 101
+        : document.foreground.coverAttribute ? 10 : 22,
     });
     const foregroundVisible = this.foregroundVisible(document);
-    const linkArrowZIndex = foregroundVisible
-      ? (document.foreground.coverLevel ? 20.5 : 22)
-      : 120;
+    const linkArrowZIndex = pser2
+      ? document.rarityMask.coverLevel
+        ? (foregroundVisible && document.foreground.coverLevel ? 20.5 : 22)
+        : 101
+      : foregroundVisible
+        ? (document.foreground.coverLevel ? 20.5 : 22)
+        : 120;
     renderer.linkArrowLeaf?.set({ zIndex: linkArrowZIndex });
   }
 

@@ -31,6 +31,7 @@ export class LegacyYugiohCardRenderer extends Card {
   copyrightLeaf = null;
   laserLeaf = null;
   rareLeaf = null;
+  rarePrintLeaf = null;
   attributeRareLeaf = null;
   twentiethLeaf = null;
   cardWidth = 1394;
@@ -702,10 +703,15 @@ export class LegacyYugiohCardRenderer extends Card {
       this.rareLeaf = new Image();
       this.leafer.add(this.rareLeaf);
     }
+    if (!this.rarePrintLeaf) {
+      this.rarePrintLeaf = new Image();
+      this.leafer.add(this.rarePrintLeaf);
+    }
 
     const suffix = this.data.type === 'pendulum' && this.data.rare !== 'pser2'
       ? '-pendulum'
       : '';
+    const printSuffix = this.data.type === 'pendulum' ? '-pendulum' : '';
     const rareUrl = this.data.rare === 'o'
       ? `${this.baseImage}/card-bleed-rainbow.png`
       : (this.data.rare ? `${this.baseImage}/rare-${this.data.rare}${suffix}.png` : '');
@@ -715,6 +721,14 @@ export class LegacyYugiohCardRenderer extends Card {
       cornerRadius: this.data.radius ? 24 : 0,
       visible: this.data.rare,
       zIndex: this.data.rare === 'o' ? 20.5 : 100,
+    });
+    this.rarePrintLeaf.set({
+      url: this.data.rare === 'pser2'
+        ? `${this.baseImage}/rare-pser-print${printSuffix}.png`
+        : '',
+      cornerRadius: this.data.radius ? 24 : 0,
+      visible: this.data.rare === 'pser2',
+      zIndex: 100.5,
     });
   }
 

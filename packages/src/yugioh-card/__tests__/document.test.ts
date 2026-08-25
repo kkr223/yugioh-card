@@ -17,6 +17,10 @@ test('creates independent default documents', () => {
   assert.equal(second.title.fill.gradientStroke, true);
   assert.equal(second.foreground.clipBelowEffectBox, false);
   assert.equal(second.rarityMask.maskEffectBox, true);
+  assert.equal(second.rarityMask.maskArtwork, false);
+  assert.equal(second.rarityMask.coverName, false);
+  assert.equal(second.rarityMask.coverAttribute, false);
+  assert.equal(second.rarityMask.coverLevel, false);
 });
 
 test('maps legacy data to a structured document and back', () => {
@@ -41,6 +45,10 @@ test('maps legacy data to a structured document and back', () => {
     rarityMaskY: 1000,
     rarityMaskScale: 0.9,
     rarityMaskEffectBox: false,
+    rarityMaskArtwork: true,
+    rarityMaskCoverName: true,
+    rarityMaskCoverAttribute: true,
+    rarityMaskCoverLevel: true,
     nameShadowColor: '#111111',
     nameBlock: true,
     effectBlockEnabled: true,
@@ -62,6 +70,10 @@ test('maps legacy data to a structured document and back', () => {
   assert.equal(document.rarityMask.source, 'mask.png');
   assert.equal(document.rarityMask.scale, 0.9);
   assert.equal(document.rarityMask.maskEffectBox, false);
+  assert.equal(document.rarityMask.maskArtwork, true);
+  assert.equal(document.rarityMask.coverName, true);
+  assert.equal(document.rarityMask.coverAttribute, true);
+  assert.equal(document.rarityMask.coverLevel, true);
   assert.equal(document.effectBox.x, 80);
   assert.equal(document.effectBox.borderStyle, 'colored');
   assert.equal(document.footer.mark25th, true);
@@ -77,6 +89,10 @@ test('maps legacy data to a structured document and back', () => {
   assert.equal(legacy.rarityMaskImage, 'mask.png');
   assert.equal(legacy.rarityMaskScale, 0.9);
   assert.equal(legacy.rarityMaskEffectBox, false);
+  assert.equal(legacy.rarityMaskArtwork, true);
+  assert.equal(legacy.rarityMaskCoverName, true);
+  assert.equal(legacy.rarityMaskCoverAttribute, true);
+  assert.equal(legacy.rarityMaskCoverLevel, true);
   assert.equal(legacy.effectBlockWidth, 1200);
   assert.equal(legacy.effectBlockBorderStyle, 'colored');
   assert.equal(legacy.mark25th, true);
@@ -131,4 +147,8 @@ test('strict parser keeps version 1 documents without the new rarity mask sectio
 
   assert.equal(parsed.rarityMask.source, '');
   assert.equal(parsed.rarityMask.maskEffectBox, true);
+  assert.equal(parsed.rarityMask.maskArtwork, false);
+  assert.equal(parsed.rarityMask.coverName, false);
+  assert.equal(parsed.rarityMask.coverAttribute, false);
+  assert.equal(parsed.rarityMask.coverLevel, false);
 });
