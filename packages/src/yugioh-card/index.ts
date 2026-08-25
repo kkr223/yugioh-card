@@ -561,13 +561,11 @@ export class YugiohCard extends LegacyYugiohCardRenderer {
     const active = Boolean(document.footer.rare)
       && (customMaskVisible || rarityMask.maskEffectBox || rarityMask.maskArtwork);
     const rareZIndex = document.footer.rare === 'o' ? 20.5 : 100;
-    rareLeaf.set({
-      blendMode: document.footer.rare === 'pser2' ? 'hard-light' : 'pass-through',
-    });
+    const rareBlendMode = document.footer.rare === 'pser2' ? 'hard-light' : 'pass-through';
 
     if (!active) {
       this.leafer.add(rareLeaf);
-      rareLeaf.set({ zIndex: rareZIndex });
+      rareLeaf.set({ blendMode: rareBlendMode, zIndex: rareZIndex });
       this.rarityMaskLayer?.set({ visible: false });
       return;
     }
@@ -593,6 +591,7 @@ export class YugiohCard extends LegacyYugiohCardRenderer {
       height: this.cardHeight,
       visible: true,
       zIndex: rareZIndex,
+      blendMode: rareBlendMode,
     });
     this.rarityMaskBackground?.set({
       width: this.cardWidth,
@@ -628,7 +627,7 @@ export class YugiohCard extends LegacyYugiohCardRenderer {
       height: Math.max(0, effectBox.height - insetTop - insetBottom),
       visible: rarityMask.maskEffectBox,
     });
-    rareLeaf.set({ zIndex: 0 });
+    rareLeaf.set({ blendMode: 'pass-through', zIndex: 0 });
   }
 
   private drawPendulumSplitMask(document: YugiohCardDocument): void {

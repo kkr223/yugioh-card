@@ -728,7 +728,7 @@ export class LegacyYugiohCardRenderer extends Card {
         : '',
       cornerRadius: this.data.radius ? 24 : 0,
       visible: this.data.rare === 'pser2',
-      zIndex: 100.5,
+      zIndex: 99.5,
     });
   }
 

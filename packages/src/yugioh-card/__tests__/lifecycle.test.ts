@@ -216,7 +216,7 @@ test('renders pser2 through an adjustable grayscale rarity mask', async () => {
   const internals = card as unknown as {
     rareLeaf: { url?: string; zIndex?: number; blendMode?: string; parent?: unknown };
     rarePrintLeaf: { visible?: boolean; url?: string; zIndex?: number };
-    rarityMaskLayer: { visible?: boolean; zIndex?: number };
+    rarityMaskLayer: { visible?: boolean; zIndex?: number; blendMode?: string };
     nameLeaf: { zIndex?: number };
     titleShadowLeaf: { zIndex?: number };
     attributeLeaf: { zIndex?: number };
@@ -250,12 +250,16 @@ test('renders pser2 through an adjustable grayscale rarity mask', async () => {
 
   assert.match(String(internals.rareLeaf.url), /rare-pser2\.png$/);
   assert.equal(internals.rareLeaf.zIndex, 0);
-  assert.equal(internals.rareLeaf.blendMode, 'hard-light');
+  assert.equal(internals.rareLeaf.blendMode, 'pass-through');
   assert.match(String(internals.rarePrintLeaf.url), /rare-pser-print-pendulum\.png$/);
   assert.equal(internals.rarePrintLeaf.visible, true);
-  assert.equal(internals.rarePrintLeaf.zIndex, 100.5);
+  assert.equal(internals.rarePrintLeaf.zIndex, 99.5);
   assert.equal(internals.rarityMaskLayer.visible, true);
   assert.equal(internals.rarityMaskLayer.zIndex, 100);
+  assert.equal(internals.rarityMaskLayer.blendMode, 'hard-light');
+  assert.ok(
+    Number(internals.rarePrintLeaf.zIndex) < Number(internals.rarityMaskLayer.zIndex),
+  );
   assert.equal(internals.titleShadowLeaf.zIndex, 101);
   assert.equal(internals.nameLeaf.zIndex, 102);
   assert.equal(internals.attributeLeaf.zIndex, 101);
@@ -284,6 +288,9 @@ test('renders pser2 through an adjustable grayscale rarity mask', async () => {
   internals.rarePrintLeaf.visible = false;
   const withoutPrint = await card.export('png', { density: 1 }) as { data: string };
   assert.notEqual(withPrint.data, withoutPrint.data);
+  internals.rarityMaskLayer.blendMode = 'pass-through';
+  const withoutHardLight = await card.export('png', { density: 1 }) as { data: string };
+  assert.notEqual(withoutPrint.data, withoutHardLight.data);
 
   card.setData({
     rarityMaskCoverName: true,
@@ -306,6 +313,7 @@ test('renders pser2 through an adjustable grayscale rarity mask', async () => {
   await card.whenReady();
   assert.equal(internals.rarityMaskLayer.visible, false);
   assert.equal(internals.rareLeaf.zIndex, 100);
+  assert.equal(internals.rareLeaf.blendMode, 'hard-light');
 
   card.setData({ rare: 'pser' });
   await card.whenReady();
