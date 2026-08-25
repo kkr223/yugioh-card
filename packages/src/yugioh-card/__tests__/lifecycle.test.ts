@@ -217,6 +217,7 @@ test('renders pser2 through an adjustable grayscale rarity mask', async () => {
     rareLeaf: { url?: string; zIndex?: number; blendMode?: string; parent?: unknown };
     rarePrintLeaf: { visible?: boolean; url?: string; zIndex?: number };
     rarityMaskLayer: { visible?: boolean; zIndex?: number; blendMode?: string };
+    foregroundClipBox: { zIndex?: number };
     nameLeaf: { zIndex?: number };
     titleShadowLeaf: { zIndex?: number };
     attributeLeaf: { zIndex?: number };
@@ -253,12 +254,15 @@ test('renders pser2 through an adjustable grayscale rarity mask', async () => {
   assert.equal(internals.rareLeaf.blendMode, 'pass-through');
   assert.match(String(internals.rarePrintLeaf.url), /rare-pser-print-pendulum\.png$/);
   assert.equal(internals.rarePrintLeaf.visible, true);
-  assert.equal(internals.rarePrintLeaf.zIndex, 99.5);
+  assert.equal(internals.rarePrintLeaf.zIndex, 20.5);
   assert.equal(internals.rarityMaskLayer.visible, true);
   assert.equal(internals.rarityMaskLayer.zIndex, 100);
   assert.equal(internals.rarityMaskLayer.blendMode, 'hard-light');
   assert.ok(
     Number(internals.rarePrintLeaf.zIndex) < Number(internals.rarityMaskLayer.zIndex),
+  );
+  assert.ok(
+    Number(internals.rarePrintLeaf.zIndex) < Number(internals.foregroundClipBox.zIndex),
   );
   assert.equal(internals.titleShadowLeaf.zIndex, 101);
   assert.equal(internals.nameLeaf.zIndex, 102);
