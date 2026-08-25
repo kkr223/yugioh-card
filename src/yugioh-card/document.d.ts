@@ -73,6 +73,19 @@ export interface YugiohCardDocument {
         coverAttribute: boolean;
         clipBelowEffectBox: boolean;
     };
+    rarityMask: {
+        source: string;
+        width: number;
+        height: number;
+        x: number;
+        y: number;
+        scale: number;
+        maskEffectBox: boolean;
+        maskArtwork: boolean;
+        coverName: boolean;
+        coverAttribute: boolean;
+        coverLevel: boolean;
+    };
     effectBox: {
         enabled: boolean;
         x: number;
@@ -169,6 +182,17 @@ export interface LegacyYugiohCardData {
     foregroundCoverLevel?: boolean;
     foregroundCoverAttribute?: boolean;
     foregroundClipBelowEffectBox?: boolean;
+    rarityMaskImage?: string;
+    rarityMaskWidth?: number;
+    rarityMaskHeight?: number;
+    rarityMaskX?: number;
+    rarityMaskY?: number;
+    rarityMaskScale?: number;
+    rarityMaskEffectBox?: boolean;
+    rarityMaskArtwork?: boolean;
+    rarityMaskCoverName?: boolean;
+    rarityMaskCoverAttribute?: boolean;
+    rarityMaskCoverLevel?: boolean;
     effectBlockEnabled?: boolean;
     effectBlockX?: number;
     effectBlockY?: number;

@@ -31,6 +31,7 @@ var h = class extends t {
 	copyrightLeaf = null;
 	laserLeaf = null;
 	rareLeaf = null;
+	rarePrintLeaf = null;
 	attributeRareLeaf = null;
 	twentiethLeaf = null;
 	cardWidth = 1394;
@@ -576,13 +577,18 @@ var h = class extends t {
 		});
 	}
 	drawRare() {
-		this.rareLeaf || (this.rareLeaf = new f(), this.leafer.add(this.rareLeaf));
-		let e = this.data.type === "pendulum" ? "-pendulum" : "", t = this.data.rare === "o" ? `${this.baseImage}/card-bleed-rainbow.png` : this.data.rare ? `${this.baseImage}/rare-${this.data.rare}${e}.png` : "";
+		this.rareLeaf || (this.rareLeaf = new f(), this.leafer.add(this.rareLeaf)), this.rarePrintLeaf || (this.rarePrintLeaf = new f(), this.leafer.add(this.rarePrintLeaf));
+		let e = this.data.type === "pendulum" && this.data.rare !== "pser2" ? "-pendulum" : "", t = this.data.type === "pendulum" ? "-pendulum" : "", n = this.data.rare === "o" ? `${this.baseImage}/card-bleed-rainbow.png` : this.data.rare ? `${this.baseImage}/rare-${this.data.rare}${e}.png` : "";
 		this.rareLeaf.set({
-			url: t,
+			url: n,
 			cornerRadius: this.data.radius ? 24 : 0,
 			visible: this.data.rare,
 			zIndex: this.data.rare === "o" ? 20.5 : 100
+		}), this.rarePrintLeaf.set({
+			url: this.data.rare === "pser2" ? `${this.baseImage}/rare-pser-print${t}.png` : "",
+			cornerRadius: this.data.radius ? 24 : 0,
+			visible: this.data.rare === "pser2",
+			zIndex: 99.5
 		});
 	}
 	drawAttributeRare() {
@@ -637,7 +643,8 @@ var h = class extends t {
 			"hr",
 			"ser",
 			"gser",
-			"pser"
+			"pser",
+			"pser2"
 		].includes(this.data.rare);
 	}
 	get showLevel() {

@@ -109,6 +109,19 @@ var e = "yugioh-card", t = 1, n = [
 		coverAttribute: !0,
 		clipBelowEffectBox: !1
 	},
+	rarityMask: {
+		source: "",
+		width: 0,
+		height: 0,
+		x: 697,
+		y: 1015.5,
+		scale: 1,
+		maskEffectBox: !0,
+		maskArtwork: !1,
+		coverName: !1,
+		coverAttribute: !1,
+		coverLevel: !1
+	},
 	effectBox: {
 		enabled: !1,
 		x: 77,
@@ -159,6 +172,7 @@ function f(e) {
 		},
 		artwork: { ...e.artwork },
 		foreground: { ...e.foreground },
+		rarityMask: { ...e.rarityMask },
 		effectBox: { ...e.effectBox },
 		text: { ...e.text },
 		footer: { ...e.footer },
@@ -196,6 +210,10 @@ function p(t = {}) {
 		foreground: {
 			...n.foreground,
 			...t.foreground
+		},
+		rarityMask: {
+			...n.rarityMask,
+			...t.rarityMask
 		},
 		effectBox: {
 			...n.effectBox,
@@ -249,8 +267,8 @@ function S(t) {
 	if (!m(t)) throw new u("expected an object");
 	if (t.kind !== "yugioh-card") throw new u(`expected ${e}`, "kind");
 	if (t.version !== 1) throw new u(`unsupported version ${String(t.version)}`, "version");
-	let l = h(t, "frame"), d = h(t, "title"), f = h(d, "fill"), p = h(d, "shadow"), S = h(t, "artwork"), C = h(t, "foreground"), w = h(t, "effectBox"), T = h(t, "text"), E = h(t, "footer"), D = h(t, "render"), O = l.arrows;
-	if (!Array.isArray(O) || O.some((e) => !Number.isInteger(e) || e < 1 || e > 8)) throw new u("expected integers from 1 to 8", "frame.arrows");
+	let l = h(t, "frame"), f = h(t, "title"), p = h(f, "fill"), S = h(f, "shadow"), C = h(t, "artwork"), w = h(t, "foreground"), T = t.rarityMask === void 0 ? d.rarityMask : h(t, "rarityMask"), E = h(t, "effectBox"), D = h(t, "text"), O = h(t, "footer"), k = h(t, "render"), A = l.arrows;
+	if (!Array.isArray(A) || A.some((e) => !Number.isInteger(e) || e < 1 || e > 8)) throw new u("expected integers from 1 to 8", "frame.arrows");
 	return {
 		kind: e,
 		version: 1,
@@ -269,82 +287,95 @@ function S(t) {
 			level: v(l.level, "frame.level"),
 			rank: v(l.rank, "frame.rank"),
 			pendulumScale: v(l.pendulumScale, "frame.pendulumScale"),
-			arrows: [...O],
+			arrows: [...A],
 			nameBlock: x(l.nameBlock, !1, "frame.nameBlock")
 		},
 		title: {
-			text: _(d.text, "title.text"),
-			align: g(d.align, o, "title.align"),
+			text: _(f.text, "title.text"),
+			align: g(f.align, o, "title.align"),
 			fill: {
-				color: _(f.color, "title.fill.color"),
-				gradient: y(f.gradient, "title.fill.gradient"),
-				gradientStroke: x(f.gradientStroke, !0, "title.fill.gradientStroke"),
-				gradientColor1: _(f.gradientColor1, "title.fill.gradientColor1"),
-				gradientColor2: _(f.gradientColor2, "title.fill.gradientColor2")
+				color: _(p.color, "title.fill.color"),
+				gradient: y(p.gradient, "title.fill.gradient"),
+				gradientStroke: x(p.gradientStroke, !0, "title.fill.gradientStroke"),
+				gradientColor1: _(p.gradientColor1, "title.fill.gradientColor1"),
+				gradientColor2: _(p.gradientColor2, "title.fill.gradientColor2")
 			},
 			shadow: {
-				enabled: y(p.enabled, "title.shadow.enabled"),
-				color: _(p.color, "title.shadow.color"),
-				gradient: y(p.gradient, "title.shadow.gradient"),
-				gradientColor1: _(p.gradientColor1, "title.shadow.gradientColor1"),
-				gradientColor2: _(p.gradientColor2, "title.shadow.gradientColor2"),
-				offsetX: v(p.offsetX, "title.shadow.offsetX"),
-				offsetY: v(p.offsetY, "title.shadow.offsetY"),
-				opacity: v(p.opacity, "title.shadow.opacity")
+				enabled: y(S.enabled, "title.shadow.enabled"),
+				color: _(S.color, "title.shadow.color"),
+				gradient: y(S.gradient, "title.shadow.gradient"),
+				gradientColor1: _(S.gradientColor1, "title.shadow.gradientColor1"),
+				gradientColor2: _(S.gradientColor2, "title.shadow.gradientColor2"),
+				offsetX: v(S.offsetX, "title.shadow.offsetX"),
+				offsetY: v(S.offsetY, "title.shadow.offsetY"),
+				opacity: v(S.opacity, "title.shadow.opacity")
 			},
-			useRarityPreset: y(d.useRarityPreset, "title.useRarityPreset")
+			useRarityPreset: y(f.useRarityPreset, "title.useRarityPreset")
 		},
 		artwork: {
-			source: _(S.source, "artwork.source"),
-			fit: g(S.fit, s, "artwork.fit")
+			source: _(C.source, "artwork.source"),
+			fit: g(C.fit, s, "artwork.fit")
 		},
 		foreground: {
-			enabled: y(C.enabled, "foreground.enabled"),
-			source: _(C.source, "foreground.source"),
-			width: v(C.width, "foreground.width"),
-			height: v(C.height, "foreground.height"),
-			x: v(C.x, "foreground.x"),
-			y: v(C.y, "foreground.y"),
-			scale: v(C.scale, "foreground.scale"),
-			rotation: v(C.rotation, "foreground.rotation"),
-			coverLevel: x(C.coverLevel, !0, "foreground.coverLevel"),
-			coverAttribute: x(C.coverAttribute, !0, "foreground.coverAttribute"),
-			clipBelowEffectBox: x(C.clipBelowEffectBox, !1, "foreground.clipBelowEffectBox")
+			enabled: y(w.enabled, "foreground.enabled"),
+			source: _(w.source, "foreground.source"),
+			width: v(w.width, "foreground.width"),
+			height: v(w.height, "foreground.height"),
+			x: v(w.x, "foreground.x"),
+			y: v(w.y, "foreground.y"),
+			scale: v(w.scale, "foreground.scale"),
+			rotation: v(w.rotation, "foreground.rotation"),
+			coverLevel: x(w.coverLevel, !0, "foreground.coverLevel"),
+			coverAttribute: x(w.coverAttribute, !0, "foreground.coverAttribute"),
+			clipBelowEffectBox: x(w.clipBelowEffectBox, !1, "foreground.clipBelowEffectBox")
+		},
+		rarityMask: {
+			source: _(T.source, "rarityMask.source"),
+			width: v(T.width, "rarityMask.width"),
+			height: v(T.height, "rarityMask.height"),
+			x: v(T.x, "rarityMask.x"),
+			y: v(T.y, "rarityMask.y"),
+			scale: v(T.scale, "rarityMask.scale"),
+			maskEffectBox: x(T.maskEffectBox, !0, "rarityMask.maskEffectBox"),
+			maskArtwork: x(T.maskArtwork, !1, "rarityMask.maskArtwork"),
+			coverName: x(T.coverName, !1, "rarityMask.coverName"),
+			coverAttribute: x(T.coverAttribute, !1, "rarityMask.coverAttribute"),
+			coverLevel: x(T.coverLevel, !1, "rarityMask.coverLevel")
 		},
 		effectBox: {
-			enabled: y(w.enabled, "effectBox.enabled"),
-			x: v(w.x, "effectBox.x"),
-			y: v(w.y, "effectBox.y"),
-			width: v(w.width, "effectBox.width"),
-			height: v(w.height, "effectBox.height"),
-			color: _(w.color, "effectBox.color"),
-			opacity: v(w.opacity, "effectBox.opacity"),
-			borderStyle: b(w.borderStyle, c, "none", "effectBox.borderStyle")
+			enabled: y(E.enabled, "effectBox.enabled"),
+			x: v(E.x, "effectBox.x"),
+			y: v(E.y, "effectBox.y"),
+			width: v(E.width, "effectBox.width"),
+			height: v(E.height, "effectBox.height"),
+			color: _(E.color, "effectBox.color"),
+			opacity: v(E.opacity, "effectBox.opacity"),
+			borderStyle: b(E.borderStyle, c, "none", "effectBox.borderStyle")
 		},
 		text: {
-			pendulumDescription: _(T.pendulumDescription, "text.pendulumDescription"),
-			monsterType: _(T.monsterType, "text.monsterType"),
-			description: _(T.description, "text.description"),
-			firstLineCompress: y(T.firstLineCompress, "text.firstLineCompress"),
-			descriptionAlign: y(T.descriptionAlign, "text.descriptionAlign"),
-			descriptionZoom: v(T.descriptionZoom, "text.descriptionZoom"),
-			descriptionWeight: v(T.descriptionWeight, "text.descriptionWeight"),
-			showAtkBar: y(T.showAtkBar, "text.showAtkBar"),
-			atk: v(T.atk, "text.atk"),
-			def: v(T.def, "text.def")
+			pendulumDescription: _(D.pendulumDescription, "text.pendulumDescription"),
+			monsterType: _(D.monsterType, "text.monsterType"),
+			description: _(D.description, "text.description"),
+			firstLineCompress: y(D.firstLineCompress, "text.firstLineCompress"),
+			descriptionAlign: y(D.descriptionAlign, "text.descriptionAlign"),
+			descriptionZoom: v(D.descriptionZoom, "text.descriptionZoom"),
+			descriptionWeight: v(D.descriptionWeight, "text.descriptionWeight"),
+			showAtkBar: y(D.showAtkBar, "text.showAtkBar"),
+			atk: v(D.atk, "text.atk"),
+			def: v(D.def, "text.def")
 		},
 		footer: {
-			package: _(E.package, "footer.package"),
-			password: _(E.password, "footer.password"),
-			copyright: _(E.copyright, "footer.copyright"),
-			laser: _(E.laser, "footer.laser"),
-			rare: _(E.rare, "footer.rare"),
-			twentieth: y(E.twentieth, "footer.twentieth"),
-			mark25th: x(E.mark25th, !1, "footer.mark25th")
+			package: _(O.package, "footer.package"),
+			password: _(O.password, "footer.password"),
+			copyright: _(O.copyright, "footer.copyright"),
+			laser: _(O.laser, "footer.laser"),
+			rare: _(O.rare, "footer.rare"),
+			twentieth: y(O.twentieth, "footer.twentieth"),
+			mark25th: x(O.mark25th, !1, "footer.mark25th")
 		},
 		render: {
-			radius: y(D.radius, "render.radius"),
-			scale: v(D.scale, "render.scale")
+			radius: y(k.radius, "render.radius"),
+			scale: v(k.scale, "render.scale")
 		}
 	};
 }
@@ -364,7 +395,7 @@ function D(e, t) {
 	return typeof e.effectBlockBorderStyle == "string" ? e.effectBlockBorderStyle === "o" || e.effectBlockBorderStyle === "alternate" ? "colored" : E(e.effectBlockBorderStyle, c, t) : typeof e.effectBlockBorder == "boolean" ? e.effectBlockBorder ? "default" : "none" : t;
 }
 function O(e = {}, t = p()) {
-	let c = C(e.nameShadowColor, t.title.shadow.color), l = C(e.foregroundImage, t.foreground.source), u = Array.isArray(e.arrowList) ? e.arrowList.filter((e) => Number.isInteger(e) && e >= 1 && e <= 8) : t.frame.arrows;
+	let c = C(e.nameShadowColor, t.title.shadow.color), l = C(e.foregroundImage, t.foreground.source), u = C(e.rarityMaskImage, t.rarityMask.source), d = Array.isArray(e.arrowList) ? e.arrowList.filter((e) => Number.isInteger(e) && e >= 1 && e <= 8) : t.frame.arrows;
 	return p({
 		frame: {
 			language: E(e.language, n, t.frame.language),
@@ -381,7 +412,7 @@ function O(e = {}, t = p()) {
 			level: w(e.level, t.frame.level),
 			rank: w(e.rank, t.frame.rank),
 			pendulumScale: w(e.pendulumScale, t.frame.pendulumScale),
-			arrows: u,
+			arrows: d,
 			nameBlock: T(e.nameBlock ?? e.outFrameNameBlock ?? e.outFrameNameBlockEnabled, t.frame.nameBlock)
 		},
 		title: {
@@ -422,6 +453,19 @@ function O(e = {}, t = p()) {
 			coverLevel: T(e.foregroundCoverLevel, t.foreground.coverLevel),
 			coverAttribute: T(e.foregroundCoverAttribute, t.foreground.coverAttribute),
 			clipBelowEffectBox: T(e.foregroundClipBelowEffectBox, t.foreground.clipBelowEffectBox)
+		},
+		rarityMask: {
+			source: u,
+			width: w(e.rarityMaskWidth, t.rarityMask.width),
+			height: w(e.rarityMaskHeight, t.rarityMask.height),
+			x: w(e.rarityMaskX, t.rarityMask.x),
+			y: w(e.rarityMaskY, t.rarityMask.y),
+			scale: w(e.rarityMaskScale, t.rarityMask.scale),
+			maskEffectBox: T(e.rarityMaskEffectBox, t.rarityMask.maskEffectBox),
+			maskArtwork: T(e.rarityMaskArtwork, t.rarityMask.maskArtwork),
+			coverName: T(e.rarityMaskCoverName, t.rarityMask.coverName),
+			coverAttribute: T(e.rarityMaskCoverAttribute, t.rarityMask.coverAttribute),
+			coverLevel: T(e.rarityMaskCoverLevel, t.rarityMask.coverLevel)
 		},
 		effectBox: {
 			enabled: T(e.effectBlockEnabled, t.effectBox.enabled),
@@ -524,6 +568,17 @@ function k(e) {
 		foregroundCoverLevel: t.foreground.coverLevel,
 		foregroundCoverAttribute: t.foreground.coverAttribute,
 		foregroundClipBelowEffectBox: t.foreground.clipBelowEffectBox,
+		rarityMaskImage: t.rarityMask.source,
+		rarityMaskWidth: t.rarityMask.width,
+		rarityMaskHeight: t.rarityMask.height,
+		rarityMaskX: t.rarityMask.x,
+		rarityMaskY: t.rarityMask.y,
+		rarityMaskScale: t.rarityMask.scale,
+		rarityMaskEffectBox: t.rarityMask.maskEffectBox,
+		rarityMaskArtwork: t.rarityMask.maskArtwork,
+		rarityMaskCoverName: t.rarityMask.coverName,
+		rarityMaskCoverAttribute: t.rarityMask.coverAttribute,
+		rarityMaskCoverLevel: t.rarityMask.coverLevel,
 		effectBlockEnabled: t.effectBox.enabled,
 		effectBlockX: t.effectBox.x,
 		effectBlockY: t.effectBox.y,

@@ -51,6 +51,12 @@ var d = class extends Error {
 		gradient: !0,
 		gradientColor1: "#855f86",
 		gradientColor2: "#fff5fd"
+	},
+	pser2: {
+		color: "#f5d6ef",
+		gradient: !0,
+		gradientColor1: "#855f86",
+		gradientColor2: "#fff5fd"
 	}
 }, m = {
 	nameBlock: {
@@ -113,7 +119,7 @@ function _(e) {
 }
 function v(e) {
 	let t = i(e);
-	return Object.freeze(t.frame.arrows), Object.freeze(t.frame), Object.freeze(t.title.fill), Object.freeze(t.title.shadow), Object.freeze(t.title), Object.freeze(t.artwork), Object.freeze(t.foreground), Object.freeze(t.effectBox), Object.freeze(t.text), Object.freeze(t.footer), Object.freeze(t.render), Object.freeze(t);
+	return Object.freeze(t.frame.arrows), Object.freeze(t.frame), Object.freeze(t.title.fill), Object.freeze(t.title.shadow), Object.freeze(t.title), Object.freeze(t.artwork), Object.freeze(t.foreground), Object.freeze(t.rarityMask), Object.freeze(t.effectBox), Object.freeze(t.text), Object.freeze(t.footer), Object.freeze(t.render), Object.freeze(t);
 }
 function y(e) {
 	return typeof e == "object" && !!e && "then" in e && typeof e.then == "function";
@@ -132,6 +138,12 @@ var b = class extends o {
 	foregroundClipBox = null;
 	foregroundLeaf = null;
 	pendulumEffectMaskLeaf = null;
+	rarityMaskLayer = null;
+	rarityMaskShape = null;
+	rarityMaskBackground = null;
+	rarityMaskLeaf = null;
+	rarityArtworkMaskLeaf = null;
+	rarityEffectBoxMaskLeaf = null;
 	effectBoxFillLeaf = null;
 	effectBoxBorderLeaf = null;
 	mark25thLeaf = null;
@@ -201,7 +213,7 @@ var b = class extends o {
 		let e = /* @__PURE__ */ Error("YugiohCard was destroyed");
 		for (let t of this.waiters.splice(0)) t.reject(e);
 		for (let e of [...this.extensions.keys()]) this.unregisterExtension(e);
-		this.nameBlockLeaf = null, this.titleShadowLeaf = null, this.foregroundClipBox = null, this.foregroundLeaf = null, this.pendulumEffectMaskLeaf = null, this.effectBoxFillLeaf = null, this.effectBoxBorderLeaf = null, this.mark25thLeaf = null, super.destroy();
+		this.nameBlockLeaf = null, this.titleShadowLeaf = null, this.foregroundClipBox = null, this.foregroundLeaf = null, this.pendulumEffectMaskLeaf = null, this.rarityMaskLayer = null, this.rarityMaskShape = null, this.rarityMaskBackground = null, this.rarityMaskLeaf = null, this.rarityArtworkMaskLeaf = null, this.rarityEffectBoxMaskLeaf = null, this.effectBoxFillLeaf = null, this.effectBoxBorderLeaf = null, this.mark25thLeaf = null, super.destroy();
 	}
 	assertActive() {
 		if (this.destroyed) throw Error("YugiohCard was destroyed");
@@ -251,7 +263,7 @@ var b = class extends o {
 	}
 	async renderRevision(e) {
 		let t = i(this.documentValue), n = a(t);
-		_(n), this.applyRarityTitlePreset(n), this.data = n, super.draw(), this.applyArtworkFit(t), this.drawPendulumSplitMask(t), this.drawNameBlock(t), this.drawTitleShadow(t), this.drawForeground(t), this.applyForegroundTitlePolicy(), this.applyForegroundOverlayPolicy(t), this.drawEffectBox(t), this.drawMark25th(t);
+		_(n), this.applyRarityTitlePreset(n), this.data = n, super.draw(), this.drawRarityMask(t), this.applyArtworkFit(t), this.drawPendulumSplitMask(t), this.drawNameBlock(t), this.drawTitleShadow(t), this.drawForeground(t), this.applyForegroundTitlePolicy(t), this.applyForegroundOverlayPolicy(t), this.drawEffectBox(t), this.drawMark25th(t);
 		let r = v(t);
 		for (let { extension: t, group: n } of this.extensions.values()) {
 			let i = t.update({
@@ -284,6 +296,61 @@ var b = class extends o {
 	foregroundVisible(e) {
 		let t = e.foreground;
 		return t.enabled && !!t.source && t.width > 0 && t.height > 0 && t.scale > 0;
+	}
+	drawRarityMask(e) {
+		if (!this.leafer) return;
+		let t = this, n = t.rareLeaf;
+		if (!n) return;
+		let r = e.rarityMask, i = !!r.source && r.width > 0 && r.height > 0 && r.scale > 0, a = !!e.footer.rare && (i || r.maskEffectBox || r.maskArtwork), o = e.footer.rare === "o" ? 20.5 : 100, s = e.footer.rare === "pser2" ? "hard-light" : "pass-through";
+		if (!a) {
+			this.leafer.add(n), n.set({
+				blendMode: s,
+				zIndex: o
+			}), this.rarityMaskLayer?.set({ visible: !1 });
+			return;
+		}
+		this.rarityMaskLayer || (this.rarityMaskLayer = new c(), this.rarityMaskShape = new c({ mask: "grayscale" }), this.rarityMaskBackground = new u({ fill: "#ffffff" }), this.rarityMaskLeaf = new l(), this.rarityArtworkMaskLeaf = new u({ fill: "#000000" }), this.rarityEffectBoxMaskLeaf = new u({ fill: "#000000" }), this.rarityMaskShape.add(this.rarityMaskBackground), this.rarityMaskShape.add(this.rarityMaskLeaf), this.rarityMaskShape.add(this.rarityArtworkMaskLeaf), this.rarityMaskShape.add(this.rarityEffectBoxMaskLeaf), this.rarityMaskLayer.add(this.rarityMaskShape), this.leafer.add(this.rarityMaskLayer)), this.rarityMaskLayer.add(n), this.rarityMaskLayer.set({
+			width: this.cardWidth,
+			height: this.cardHeight,
+			visible: !0,
+			zIndex: o,
+			blendMode: s
+		}), this.rarityMaskBackground?.set({
+			width: this.cardWidth,
+			height: this.cardHeight,
+			visible: !0
+		}), this.rarityMaskLeaf?.set({
+			url: r.source,
+			width: r.width,
+			height: r.height,
+			x: r.x,
+			y: r.y,
+			scaleX: r.scale,
+			scaleY: r.scale,
+			around: {
+				type: "percent",
+				x: .5,
+				y: .5
+			},
+			visible: i
+		}), this.rarityArtworkMaskLeaf?.set({
+			x: t.imageLeaf?.x ?? 0,
+			y: t.imageLeaf?.y ?? 0,
+			width: t.imageLeaf?.width ?? 0,
+			height: t.imageLeaf?.height ?? 0,
+			visible: r.maskArtwork
+		});
+		let d = e.effectBox, f = Math.min(16, d.width / 2), p = Math.min(16, d.height / 2), m = Math.min(20, d.height / 2);
+		this.rarityEffectBoxMaskLeaf?.set({
+			x: d.x + f,
+			y: d.y + p,
+			width: Math.max(0, d.width - f * 2),
+			height: Math.max(0, d.height - p - m),
+			visible: r.maskEffectBox
+		}), n.set({
+			blendMode: "pass-through",
+			zIndex: 0
+		});
 	}
 	drawPendulumSplitMask(e) {
 		if (!this.leafer) return;
@@ -398,14 +465,15 @@ var b = class extends o {
 			zIndex: 21
 		});
 	}
-	applyForegroundTitlePolicy() {
-		this.nameLeaf?.set({ zIndex: 23 });
+	applyForegroundTitlePolicy(e) {
+		let t = this, n = e.footer.rare === "pser2" && !e.rarityMask.coverName;
+		this.titleShadowLeaf?.set({ zIndex: n ? 101 : 22 }), t.nameLeaf?.set({ zIndex: n ? 102 : 23 });
 	}
 	applyForegroundOverlayPolicy(e) {
-		let t = this, n = e.foreground.coverLevel ? 10 : 22;
-		t.levelLeaf?.set({ zIndex: n }), t.rankLeaf?.set({ zIndex: n }), t.attributeLeaf?.set({ zIndex: e.foreground.coverAttribute ? 10 : 22 });
-		let r = this.foregroundVisible(e) ? e.foreground.coverLevel ? 20.5 : 22 : 120;
-		t.linkArrowLeaf?.set({ zIndex: r });
+		let t = this, n = e.footer.rare === "pser2", r = n && !e.rarityMask.coverLevel ? 101 : e.foreground.coverLevel ? 10 : 22;
+		t.levelLeaf?.set({ zIndex: r }), t.rankLeaf?.set({ zIndex: r }), t.attributeLeaf?.set({ zIndex: n && !e.rarityMask.coverAttribute ? 101 : e.foreground.coverAttribute ? 10 : 22 });
+		let i = this.foregroundVisible(e), a = n ? e.rarityMask.coverLevel ? i && e.foreground.coverLevel ? 20.5 : 22 : 101 : i ? e.foreground.coverLevel ? 20.5 : 22 : 120;
+		t.linkArrowLeaf?.set({ zIndex: a });
 	}
 	drawEffectBox(e) {
 		if (!this.leafer) return;

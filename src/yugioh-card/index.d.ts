@@ -37,6 +37,12 @@ export declare class YugiohCard extends LegacyYugiohCardRenderer {
     private foregroundClipBox;
     private foregroundLeaf;
     private pendulumEffectMaskLeaf;
+    private rarityMaskLayer;
+    private rarityMaskShape;
+    private rarityMaskBackground;
+    private rarityMaskLeaf;
+    private rarityArtworkMaskLeaf;
+    private rarityEffectBoxMaskLeaf;
     private effectBoxFillLeaf;
     private effectBoxBorderLeaf;
     private mark25thLeaf;
@@ -62,6 +68,7 @@ export declare class YugiohCard extends LegacyYugiohCardRenderer {
     private applyRarityTitlePreset;
     private applyArtworkFit;
     private foregroundVisible;
+    private drawRarityMask;
     private drawPendulumSplitMask;
     private drawTitleShadow;
     private drawNameBlock;
