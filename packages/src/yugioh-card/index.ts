@@ -84,6 +84,7 @@ type LegacyRendererShape = {
   rankLeaf?: Group | null;
   linkArrowLeaf?: Group | null;
   rareLeaf?: Image | null;
+  rareEffectBorderLeaf?: Image | null;
 };
 
 const SLOT_Z_INDEX: Record<YugiohCardLayerSlot, number> = {
@@ -144,18 +145,18 @@ const RARITY_TITLE_PRESETS: Record<
 
 const OUT_FRAME_LAYOUT = {
   nameBlock: {
-    url: '/yugioh/image/name-block.png',
+    url: '/yugioh/image/other/name-block.png',
     x: 76,
     y: 82,
     width: 1242,
     height: 157,
   },
   effectBox: {
-    defaultUrl: '/yugioh/image/eblock-border.png',
-    coloredUrl: '/yugioh/image/eblock-border-o.png',
+    defaultUrl: '/yugioh/image/effect-border/eblock-border.png',
+    coloredUrl: '/yugioh/image/effect-border/eblock-border-color.png',
   },
   mark25th: {
-    url: '/yugioh/image/mark25th.png',
+    url: '/yugioh/image/watermark/mark25th.png',
     x: 503,
     y: 1496,
     width: 388,
@@ -165,28 +166,21 @@ const OUT_FRAME_LAYOUT = {
 
 const MASK_LAYOUT = {
   normal: {
-    url: '/yugioh/image/card-mask.png',
+    url: '/yugioh/image/art-border/art-frame-base.png',
     x: 117,
     y: 322,
     width: 1162,
     height: 1162,
   },
-  pendulum: {
-    url: '/yugioh/image/card-mask-pendulum.png',
-    x: 68,
-    y: 342,
-    width: 1257,
-    height: 1595,
-  },
   pendulumArt: {
-    url: '/yugioh/image/card-mask-pendulum-art.png',
+    url: '/yugioh/image/pendulum-frame/pframe-art-base.png',
     x: 68,
     y: 342,
     width: 1257,
     height: 914,
   },
   pendulumEffect: {
-    url: '/yugioh/image/card-mask-pendulum-effect.png',
+    url: '/yugioh/image/pendulum-frame/pframe-effect-base.png',
     x: 68,
     y: 1256,
     width: 1257,
@@ -644,11 +638,8 @@ export class YugiohCard extends LegacyYugiohCardRenderer {
       this.leafer.add(this.pendulumEffectMaskLeaf);
     }
 
-    const split = document.frame.type === 'pendulum' && this.foregroundVisible(document);
-    if (!split) {
-      const layout = document.frame.type === 'pendulum'
-        ? MASK_LAYOUT.pendulum
-        : MASK_LAYOUT.normal;
+    if (document.frame.type !== 'pendulum') {
+      const layout = MASK_LAYOUT.normal;
       maskLeaf.set({
         url: this.resourceUrl(layout.url),
         x: layout.x,
@@ -816,6 +807,7 @@ export class YugiohCard extends LegacyYugiohCardRenderer {
     if (!this.leafer) {
       return;
     }
+    const renderer = this as unknown as LegacyRendererShape;
     if (!this.effectBoxFillLeaf) {
       this.effectBoxFillLeaf = new Rect();
       this.leafer.add(this.effectBoxFillLeaf);
@@ -857,6 +849,12 @@ export class YugiohCard extends LegacyYugiohCardRenderer {
       height: effectBox.height,
       visible: borderVisible,
       zIndex: 29,
+    });
+    renderer.rareEffectBorderLeaf?.set({
+      x: effectBox.x,
+      y: effectBox.y,
+      width: effectBox.width,
+      height: effectBox.height,
     });
   }
 

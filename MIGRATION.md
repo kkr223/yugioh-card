@@ -93,19 +93,21 @@ await card.updateDocument(document => ({
 ```
 
 Legacy flat data can use `nameBlock`, `rare: 'o'`, `effectBlockBorder`, and
-`mark25th`. The out-frame rarity uses `card-bleed-rainbow.png`; enabling
-`effectBlockBorder` adds `eblock-border-o.png` above the foreground. The old
+`mark25th`. The out-frame rarity uses `card-border/card-border-color.png`;
+enabling `effectBlockBorder` adds a resource from `effect-border/` above the
+foreground. The old
 `effectBlockBorderStyle: 'colored'` value remains supported for compatibility.
+Rarity values are now presets that compose the separate card border, artwork or
+pendulum frame, effect-box border, and `rare-effect/` overlay resources.
 Use `foregroundCoverLevel: false` when the foreground image should stay behind
 level, rank, and link-marker overlays. Use `foregroundCoverAttribute: false`
 when it should also stay behind the attribute icon. Use
 `foregroundClipBelowEffectBox: true` to hide foreground pixels below the bottom
 edge of the effect box.
 
-Pendulum cards with a visible foreground automatically split the pendulum mask:
-`card-mask-pendulum-art.png` stays below the foreground, while
-`card-mask-pendulum-effect.png` stays above it. Pendulum cards without a
-foreground keep using the original `card-mask-pendulum.png`.
+Pendulum cards always compose the split frame resources:
+`pendulum-frame/pframe-art-base.png` stays below the foreground, while
+`pendulum-frame/pframe-effect-base.png` stays above it.
 
 ## Node Rendering
 

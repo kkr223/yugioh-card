@@ -85,6 +85,47 @@ test('updateDocument receives a detached readonly document', async () => {
   card.destroy();
 });
 
+test('resolves base card resources from the categorized image directories', async () => {
+  const card = new YugiohCard({
+    resourcePath,
+    skia,
+    data: {
+      type: 'monster',
+      cardType: 'normal',
+      attribute: 'light',
+      level: 1,
+      icon: 'continuous',
+      copyright: 'sc',
+      laser: 'laser1',
+      scale: 0.1,
+    },
+  });
+
+  await card.whenReady();
+  const internals = card as unknown as {
+    cardLeaf: { url?: string };
+    attributeLeaf: { url?: string };
+    levelLeaf: { children: Array<{ url?: string }> };
+    spellTrapLeaf: { children: Array<{ url?: string }> };
+    maskLeaf: { url?: string };
+    linkArrowLeaf: { children: Array<{ url?: string }> };
+    atkDefLinkLeaf: { children: Array<{ url?: string }> };
+    copyrightLeaf: { url?: string };
+    laserLeaf: { url?: string };
+  };
+
+  assert.match(String(internals.cardLeaf.url), /card\/card-normal\.png$/);
+  assert.match(String(internals.attributeLeaf.url), /attribute\/attribute-light\.png$/);
+  assert.match(String(internals.levelLeaf.children[0].url), /level\/level\.png$/);
+  assert.match(String(internals.spellTrapLeaf.children[1].url), /icon\/icon-continuous\.png$/);
+  assert.match(String(internals.maskLeaf.url), /art-border\/art-frame-base\.png$/);
+  assert.match(String(internals.linkArrowLeaf.children[0].url), /linkmarker\/arrow-up-off\.png$/);
+  assert.match(String(internals.atkDefLinkLeaf.children[0].url), /text\/atk-def\.svg$/);
+  assert.match(String(internals.copyrightLeaf.url), /copyright\/copyright-sc-black\.svg$/);
+  assert.match(String(internals.laserLeaf.url), /fp-mark\/laser1\.png$/);
+  card.destroy();
+});
+
 test('renders optional out-frame resources from document switches', async () => {
   const card = new YugiohCard({
     resourcePath,
@@ -129,7 +170,7 @@ test('renders optional out-frame resources from document switches', async () => 
   assert.equal(internals.nameBlockLeaf.y, 82);
   assert.equal(internals.effectBoxFillLeaf.visible, false);
   assert.equal(internals.effectBoxBorderLeaf.visible, true);
-  assert.match(String(internals.effectBoxBorderLeaf.url), /eblock-border-o\.png$/);
+  assert.match(String(internals.effectBoxBorderLeaf.url), /eblock-border-color\.png$/);
   assert.equal(internals.effectBoxBorderLeaf.x, 77);
   assert.equal(internals.effectBoxBorderLeaf.y, 1501);
   assert.equal(internals.effectBoxBorderLeaf.width, 1239);
@@ -163,15 +204,17 @@ test('renders out-frame rarity with independently optional effect-box border', a
 
   await card.whenReady();
   const internals = card as unknown as {
-    rareLeaf: { visible?: boolean; url?: string; zIndex?: number };
+    rareCardBorderLeaf: { visible?: boolean; url?: string; zIndex?: number };
     foregroundLeaf: { visible?: boolean; zIndex?: number };
     effectBoxBorderLeaf: { visible?: boolean; url?: string; zIndex?: number };
   };
 
-  assert.equal(Boolean(internals.rareLeaf.visible), true);
-  assert.match(String(internals.rareLeaf.url), /card-bleed-rainbow\.png$/);
+  assert.equal(internals.rareCardBorderLeaf.visible, true);
+  assert.match(String(internals.rareCardBorderLeaf.url), /card-border-color\.png$/);
   assert.equal(internals.foregroundLeaf.visible, true);
-  assert.ok(Number(internals.rareLeaf.zIndex) < Number(internals.foregroundLeaf.zIndex));
+  assert.ok(
+    Number(internals.rareCardBorderLeaf.zIndex) < Number(internals.foregroundLeaf.zIndex),
+  );
   assert.equal(internals.effectBoxBorderLeaf.visible, false);
 
   card.setData({ effectBlockBorder: true });
@@ -183,11 +226,88 @@ test('renders out-frame rarity with independently optional effect-box border', a
   card.setData({ effectBlockBorderStyle: 'colored' });
   await card.whenReady();
 
-  assert.match(String(internals.effectBoxBorderLeaf.url), /eblock-border-o\.png$/);
+  assert.match(String(internals.effectBoxBorderLeaf.url), /eblock-border-color\.png$/);
   assert.equal(internals.effectBoxBorderLeaf.visible, true);
   assert.ok(
     Number(internals.effectBoxBorderLeaf.zIndex) > Number(internals.foregroundLeaf.zIndex),
   );
+  card.destroy();
+});
+
+test('expands rarity presets into reusable border and effect layers', async () => {
+  const card = new YugiohCard({
+    resourcePath,
+    skia,
+    data: { rare: 'hr', scale: 0.1 },
+  });
+
+  await card.whenReady();
+  const internals = card as unknown as {
+    rareLeaf: {
+      visible?: boolean;
+      url?: string;
+      x?: number;
+      y?: number;
+      width?: number;
+      height?: number;
+    };
+    rareCardBorderLeaf: { visible?: boolean; url?: string };
+    rareArtBorderLeaf: { visible?: boolean; url?: string };
+    rarePendulumArtBorderLeaf: { visible?: boolean; url?: string };
+    rarePendulumEffectBorderLeaf: { visible?: boolean; url?: string; zIndex?: number };
+    rareEffectBorderLeaf: {
+      visible?: boolean;
+      url?: string;
+      x?: number;
+      y?: number;
+      width?: number;
+      height?: number;
+    };
+    foregroundLeaf: { zIndex?: number };
+  };
+
+  assert.match(String(internals.rareLeaf.url), /rare-effect\/rare-hr\.png$/);
+  assert.match(String(internals.rareCardBorderLeaf.url), /card-border-silver\.png$/);
+  assert.match(String(internals.rareArtBorderLeaf.url), /art-frame-silver\.png$/);
+  assert.equal(internals.rareArtBorderLeaf.visible, true);
+  assert.match(String(internals.rareEffectBorderLeaf.url), /eblock-border-color\.png$/);
+  assert.equal(internals.rareEffectBorderLeaf.visible, true);
+  assert.equal(internals.rareEffectBorderLeaf.x, 77);
+  assert.equal(internals.rareEffectBorderLeaf.y, 1501);
+  assert.equal(internals.rareEffectBorderLeaf.width, 1239);
+  assert.equal(internals.rareEffectBorderLeaf.height, 427);
+
+  card.setData({ type: 'pendulum', rare: 'hr' });
+  await card.whenReady();
+  assert.ok(Number(internals.rareLeaf.x) < 0);
+  assert.ok(Number(internals.rareLeaf.y) > 0);
+  assert.ok(Number(internals.rareLeaf.width) > 1394);
+  assert.ok(Number(internals.rareLeaf.height) < 2031);
+
+  card.setData({ type: 'pendulum', rare: 'gser' });
+  await card.whenReady();
+  assert.match(String(internals.rareLeaf.url), /rare-ser-pendulum\.png$/);
+  assert.equal(internals.rareLeaf.x, 0);
+  assert.equal(internals.rareLeaf.y, 0);
+  assert.equal(internals.rareLeaf.width, 1394);
+  assert.equal(internals.rareLeaf.height, 2031);
+  assert.match(String(internals.rareCardBorderLeaf.url), /card-border-color\.png$/);
+  assert.equal(internals.rareArtBorderLeaf.visible, false);
+  assert.match(String(internals.rarePendulumArtBorderLeaf.url), /pframe-art-gold\.png$/);
+  assert.equal(internals.rarePendulumArtBorderLeaf.visible, true);
+  assert.match(String(internals.rarePendulumEffectBorderLeaf.url), /pframe-effect-gold\.png$/);
+  assert.equal(internals.rarePendulumEffectBorderLeaf.visible, true);
+  assert.ok(
+    Number(internals.rarePendulumEffectBorderLeaf.zIndex) > Number(internals.foregroundLeaf.zIndex),
+  );
+  assert.equal(internals.rareEffectBorderLeaf.visible, false);
+
+  card.setData({ type: 'monster', rare: 'gr' });
+  await card.whenReady();
+  assert.equal(internals.rareLeaf.visible, false);
+  assert.match(String(internals.rareCardBorderLeaf.url), /card-border-gold\.png$/);
+  assert.match(String(internals.rareArtBorderLeaf.url), /art-frame-gold\.png$/);
+  assert.equal(internals.rareArtBorderLeaf.visible, true);
   card.destroy();
 });
 
@@ -215,7 +335,9 @@ test('renders pser2 through an adjustable grayscale rarity mask', async () => {
   await card.whenReady();
   const internals = card as unknown as {
     rareLeaf: { url?: string; zIndex?: number; blendMode?: string; parent?: unknown };
-    rarePrintLeaf: { visible?: boolean; url?: string; zIndex?: number };
+    rareCardBorderLeaf: { visible?: boolean; url?: string; zIndex?: number };
+    rarePendulumArtBorderLeaf: { visible?: boolean; url?: string; zIndex?: number };
+    rarePendulumEffectBorderLeaf: { visible?: boolean; url?: string; zIndex?: number };
     rarityMaskLayer: { visible?: boolean; zIndex?: number; blendMode?: string };
     foregroundClipBox: { zIndex?: number };
     nameLeaf: { zIndex?: number };
@@ -249,20 +371,27 @@ test('renders pser2 through an adjustable grayscale rarity mask', async () => {
     };
   };
 
-  assert.match(String(internals.rareLeaf.url), /rare-pser2\.png$/);
+  assert.match(String(internals.rareLeaf.url), /rare-effect\/rare-pser2\.png$/);
   assert.equal(internals.rareLeaf.zIndex, 0);
   assert.equal(internals.rareLeaf.blendMode, 'pass-through');
-  assert.match(String(internals.rarePrintLeaf.url), /rare-pser-print-pendulum\.png$/);
-  assert.equal(internals.rarePrintLeaf.visible, true);
-  assert.equal(internals.rarePrintLeaf.zIndex, 20.5);
+  assert.match(String(internals.rareCardBorderLeaf.url), /card-border-silver\.png$/);
+  assert.equal(internals.rareCardBorderLeaf.visible, true);
+  assert.equal(internals.rareCardBorderLeaf.zIndex, 20.5);
+  assert.match(String(internals.rarePendulumArtBorderLeaf.url), /pframe-art-sliver\.png$/);
+  assert.equal(internals.rarePendulumArtBorderLeaf.visible, true);
+  assert.match(
+    String(internals.rarePendulumEffectBorderLeaf.url),
+    /pframe-effect-sliver\.png$/,
+  );
+  assert.equal(internals.rarePendulumEffectBorderLeaf.visible, true);
   assert.equal(internals.rarityMaskLayer.visible, true);
   assert.equal(internals.rarityMaskLayer.zIndex, 100);
   assert.equal(internals.rarityMaskLayer.blendMode, 'hard-light');
   assert.ok(
-    Number(internals.rarePrintLeaf.zIndex) < Number(internals.rarityMaskLayer.zIndex),
+    Number(internals.rareCardBorderLeaf.zIndex) < Number(internals.rarityMaskLayer.zIndex),
   );
   assert.ok(
-    Number(internals.rarePrintLeaf.zIndex) < Number(internals.foregroundClipBox.zIndex),
+    Number(internals.rareCardBorderLeaf.zIndex) < Number(internals.foregroundClipBox.zIndex),
   );
   assert.equal(internals.titleShadowLeaf.zIndex, 101);
   assert.equal(internals.nameLeaf.zIndex, 102);
@@ -288,13 +417,13 @@ test('renders pser2 through an adjustable grayscale rarity mask', async () => {
   assert.equal(internals.rarityEffectBoxMaskLeaf.width, 1207);
   assert.equal(internals.rarityEffectBoxMaskLeaf.height, 391);
 
-  const withPrint = await card.export('png', { density: 1 }) as { data: string };
-  internals.rarePrintLeaf.visible = false;
-  const withoutPrint = await card.export('png', { density: 1 }) as { data: string };
-  assert.notEqual(withPrint.data, withoutPrint.data);
+  const withBorder = await card.export('png', { density: 1 }) as { data: string };
+  internals.rareCardBorderLeaf.visible = false;
+  const withoutBorder = await card.export('png', { density: 1 }) as { data: string };
+  assert.notEqual(withBorder.data, withoutBorder.data);
   internals.rarityMaskLayer.blendMode = 'pass-through';
   const withoutHardLight = await card.export('png', { density: 1 }) as { data: string };
-  assert.notEqual(withoutPrint.data, withoutHardLight.data);
+  assert.notEqual(withoutBorder.data, withoutHardLight.data);
 
   card.setData({
     rarityMaskCoverName: true,
@@ -321,12 +450,14 @@ test('renders pser2 through an adjustable grayscale rarity mask', async () => {
 
   card.setData({ rare: 'pser' });
   await card.whenReady();
-  assert.match(String(internals.rareLeaf.url), /rare-pser-pendulum\.png$/);
-  assert.equal(internals.rarePrintLeaf.visible, false);
+  assert.match(String(internals.rareLeaf.url), /rare-ser-pendulum\.png$/);
+  assert.equal(internals.rareCardBorderLeaf.visible, true);
+  assert.match(String(internals.rareCardBorderLeaf.url), /card-border-silver\.png$/);
 
   card.setData({ rare: '' });
   await card.whenReady();
   assert.equal(internals.rareLeaf.blendMode, 'pass-through');
+  assert.equal(internals.rareCardBorderLeaf.visible, false);
   card.destroy();
 });
 
@@ -443,7 +574,7 @@ test('foreground can avoid covering level, rank, attribute and link-marker overl
   card.destroy();
 });
 
-test('pendulum foreground cards split art and effect masks around the foreground', async () => {
+test('pendulum cards compose separate art and effect frame resources', async () => {
   const card = new YugiohCard({
     resourcePath,
     skia,
@@ -483,7 +614,7 @@ test('pendulum foreground cards split art and effect masks around the foreground
     };
   };
 
-  assert.match(String(internals.maskLeaf.url), /card-mask-pendulum-art\.png$/);
+  assert.match(String(internals.maskLeaf.url), /pframe-art-base\.png$/);
   assert.equal(internals.maskLeaf.x, 68);
   assert.equal(internals.maskLeaf.y, 342);
   assert.equal(internals.maskLeaf.width, 1257);
@@ -492,7 +623,7 @@ test('pendulum foreground cards split art and effect masks around the foreground
   assert.equal(internals.pendulumEffectMaskLeaf.visible, true);
   assert.match(
     String(internals.pendulumEffectMaskLeaf.url),
-    /card-mask-pendulum-effect\.png$/,
+    /pframe-effect-base\.png$/,
   );
   assert.equal(internals.pendulumEffectMaskLeaf.x, 68);
   assert.equal(internals.pendulumEffectMaskLeaf.y, 1256);
@@ -510,9 +641,9 @@ test('pendulum foreground cards split art and effect masks around the foreground
     },
   }));
 
-  assert.match(String(internals.maskLeaf.url), /card-mask-pendulum\.png$/);
+  assert.match(String(internals.maskLeaf.url), /pframe-art-base\.png$/);
   assert.equal(internals.maskLeaf.width, 1257);
-  assert.equal(internals.maskLeaf.height, 1595);
-  assert.equal(internals.pendulumEffectMaskLeaf.visible, false);
+  assert.equal(internals.maskLeaf.height, 914);
+  assert.equal(internals.pendulumEffectMaskLeaf.visible, true);
   card.destroy();
 });

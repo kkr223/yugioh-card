@@ -11,6 +11,46 @@ import astralStyle from './style/astral-style.ts';
 import custom1Style from './style/custom1-style.ts';
 import custom2Style from './style/custom2-style.ts';
 
+const RARITY_LAYER_PRESETS = {
+  dt: { effect: 'dt' },
+  ur: { effect: 'ur', pendulumEffect: true },
+  gr: { cardBorder: 'gold', artBorder: 'gold', pendulumFrame: 'gold' },
+  hr: {
+    effect: 'hr',
+    cardBorder: 'silver',
+    artBorder: 'silver',
+    pendulumFrame: 'sliver',
+    effectBorder: 'color',
+  },
+  ser: { effect: 'ser', pendulumEffect: true },
+  gser: {
+    effect: 'ser',
+    pendulumEffect: true,
+    cardBorder: 'color',
+    artBorder: 'color',
+    pendulumFrame: 'gold',
+    effectBorder: 'color',
+  },
+  pser: {
+    effect: 'ser',
+    pendulumEffect: true,
+    cardBorder: 'silver',
+    artBorder: 'silver',
+    pendulumFrame: 'sliver',
+    effectBorder: 'color',
+  },
+  pser2: {
+    effect: 'pser2',
+    cardBorder: 'silver',
+    artBorder: 'silver',
+    pendulumFrame: 'sliver',
+  },
+  o: { cardBorder: 'color' },
+};
+
+const HR_EFFECT_SOURCE_FRAME = { x: 170, y: 375, width: 1054, height: 1054 };
+const HR_EFFECT_PENDULUM_FRAME = { x: 94, y: 364, width: 1205, height: 900 };
+
 export class LegacyYugiohCardRenderer extends Card {
   cardLeaf = null;
   nameLeaf = null;
@@ -31,7 +71,11 @@ export class LegacyYugiohCardRenderer extends Card {
   copyrightLeaf = null;
   laserLeaf = null;
   rareLeaf = null;
-  rarePrintLeaf = null;
+  rareCardBorderLeaf = null;
+  rareArtBorderLeaf = null;
+  rarePendulumArtBorderLeaf = null;
+  rarePendulumEffectBorderLeaf = null;
+  rareEffectBorderLeaf = null;
   attributeRareLeaf = null;
   twentiethLeaf = null;
   cardWidth = 1394;
@@ -178,7 +222,7 @@ export class LegacyYugiohCardRenderer extends Card {
       this.leafer.add(this.levelLeaf);
     }
 
-    const levelUrl = `${this.baseImage}/level.png`;
+    const levelUrl = `${this.baseImage}/level/level.png`;
     const levelWidth = 88;
     const right = this.data.level < 13 ? 147 : 101;
     this.levelLeaf.children.forEach((level, index) => {
@@ -207,7 +251,7 @@ export class LegacyYugiohCardRenderer extends Card {
       this.leafer.add(this.rankLeaf);
     }
 
-    const rankUrl = `${this.baseImage}/rank.png`;
+    const rankUrl = `${this.baseImage}/level/rank.png`;
     const rankWidth = 88;
     const left = this.data.rank < 13 ? 147 : 101;
     this.rankLeaf.children.forEach((rank, index) => {
@@ -243,7 +287,7 @@ export class LegacyYugiohCardRenderer extends Card {
     const { spellTrap } = this.style;
     const { icon } = spellTrap;
 
-    const iconUrl = this.data.icon ? `${this.baseImage}/icon-${this.data.icon}.png` : '';
+    const iconUrl = this.data.icon ? `${this.baseImage}/icon/icon-${this.data.icon}.png` : '';
     const iconWidth = this.data.icon ? 72 : 0;
     const leftBracket = ['en', 'kr'].includes(this.data.language) ? '[' : '【';
     const rightBracket = ['en', 'kr'].includes(this.data.language) ? ']' : '】';
@@ -322,7 +366,9 @@ export class LegacyYugiohCardRenderer extends Card {
       this.leafer.add(this.maskLeaf);
     }
 
-    const maskUrl = this.data.type === 'pendulum' ? `${this.baseImage}/card-mask-pendulum.png` : `${this.baseImage}/card-mask.png`;
+    const maskUrl = this.data.type === 'pendulum'
+      ? `${this.baseImage}/pendulum-frame/pframe-art-base.png`
+      : `${this.baseImage}/art-border/art-frame-base.png`;
     this.maskLeaf.set({
       url: maskUrl,
       x: this.data.type === 'pendulum' ? 68 : 117,
@@ -438,25 +484,25 @@ export class LegacyYugiohCardRenderer extends Card {
     }
 
     const arrowOnList = [
-      { x: 555, y: 278, url: this.baseImage + '/arrow-up-on.png' },
-      { x: 1130, y: 299, url: this.baseImage + '/arrow-right-up-on.png' },
-      { x: 1223, y: 761, url: this.baseImage + '/arrow-right-on.png' },
-      { x: 1130, y: 1336, url: this.baseImage + '/arrow-right-down-on.png' },
-      { x: 555, y: 1428, url: this.baseImage + '/arrow-down-on.png' },
-      { x: 95, y: 1336, url: this.baseImage + '/arrow-left-down-on.png' },
-      { x: 71, y: 758, url: this.baseImage + '/arrow-left-on.png' },
-      { x: 95, y: 299, url: this.baseImage + '/arrow-left-up-on.png' },
+      { x: 555, y: 278, url: this.baseImage + '/linkmarker/arrow-up-on.png' },
+      { x: 1130, y: 299, url: this.baseImage + '/linkmarker/arrow-right-up-on.png' },
+      { x: 1223, y: 761, url: this.baseImage + '/linkmarker/arrow-right-on.png' },
+      { x: 1130, y: 1336, url: this.baseImage + '/linkmarker/arrow-right-down-on.png' },
+      { x: 555, y: 1428, url: this.baseImage + '/linkmarker/arrow-down-on.png' },
+      { x: 95, y: 1336, url: this.baseImage + '/linkmarker/arrow-left-down-on.png' },
+      { x: 71, y: 758, url: this.baseImage + '/linkmarker/arrow-left-on.png' },
+      { x: 95, y: 299, url: this.baseImage + '/linkmarker/arrow-left-up-on.png' },
     ];
 
     const arrowOffList = [
-      { x: 555, y: 278, url: this.baseImage + '/arrow-up-off.png' },
-      { x: 1130, y: 299, url: this.baseImage + '/arrow-right-up-off.png' },
-      { x: 1223, y: 761, url: this.baseImage + '/arrow-right-off.png' },
-      { x: 1130, y: 1336, url: this.baseImage + '/arrow-right-down-off.png' },
-      { x: 555, y: 1428, url: this.baseImage + '/arrow-down-off.png' },
-      { x: 95, y: 1336, url: this.baseImage + '/arrow-left-down-off.png' },
-      { x: 71, y: 758, url: this.baseImage + '/arrow-left-off.png' },
-      { x: 95, y: 299, url: this.baseImage + '/arrow-left-up-off.png' },
+      { x: 555, y: 278, url: this.baseImage + '/linkmarker/arrow-up-off.png' },
+      { x: 1130, y: 299, url: this.baseImage + '/linkmarker/arrow-right-up-off.png' },
+      { x: 1223, y: 761, url: this.baseImage + '/linkmarker/arrow-right-off.png' },
+      { x: 1130, y: 1336, url: this.baseImage + '/linkmarker/arrow-right-down-off.png' },
+      { x: 555, y: 1428, url: this.baseImage + '/linkmarker/arrow-down-off.png' },
+      { x: 95, y: 1336, url: this.baseImage + '/linkmarker/arrow-left-down-off.png' },
+      { x: 71, y: 758, url: this.baseImage + '/linkmarker/arrow-left-off.png' },
+      { x: 95, y: 299, url: this.baseImage + '/linkmarker/arrow-left-up-off.png' },
     ];
 
     this.linkArrowLeaf.children.forEach((arrow, index) => {
@@ -671,7 +717,9 @@ export class LegacyYugiohCardRenderer extends Card {
     }
 
     const color = this.data.type === 'monster' && this.data.cardType === 'xyz' ? 'white' : 'black';
-    const copyrightUrl = this.data.copyright ? `${this.baseImage}/copyright-${this.data.copyright}-${color}.svg` : '';
+    const copyrightUrl = this.data.copyright
+      ? `${this.baseImage}/copyright/copyright-${this.data.copyright}-${color}.svg`
+      : '';
     this.copyrightLeaf.set({
       url: copyrightUrl,
       x: this.cardWidth - 141,
@@ -688,7 +736,7 @@ export class LegacyYugiohCardRenderer extends Card {
       this.leafer.add(this.laserLeaf);
     }
 
-    const laserUrl = this.data.laser ? `${this.baseImage}/${this.data.laser}.png` : '';
+    const laserUrl = this.data.laser ? `${this.baseImage}/fp-mark/${this.data.laser}.png` : '';
     this.laserLeaf.set({
       url: laserUrl,
       x: 1276,
@@ -703,32 +751,94 @@ export class LegacyYugiohCardRenderer extends Card {
       this.rareLeaf = new Image();
       this.leafer.add(this.rareLeaf);
     }
-    if (!this.rarePrintLeaf) {
-      this.rarePrintLeaf = new Image();
-      this.leafer.add(this.rarePrintLeaf);
+    if (!this.rareCardBorderLeaf) {
+      this.rareCardBorderLeaf = new Image();
+      this.leafer.add(this.rareCardBorderLeaf);
+    }
+    if (!this.rareArtBorderLeaf) {
+      this.rareArtBorderLeaf = new Image();
+      this.leafer.add(this.rareArtBorderLeaf);
+    }
+    if (!this.rarePendulumArtBorderLeaf) {
+      this.rarePendulumArtBorderLeaf = new Image();
+      this.leafer.add(this.rarePendulumArtBorderLeaf);
+    }
+    if (!this.rarePendulumEffectBorderLeaf) {
+      this.rarePendulumEffectBorderLeaf = new Image();
+      this.leafer.add(this.rarePendulumEffectBorderLeaf);
+    }
+    if (!this.rareEffectBorderLeaf) {
+      this.rareEffectBorderLeaf = new Image();
+      this.leafer.add(this.rareEffectBorderLeaf);
     }
 
-    const suffix = this.data.type === 'pendulum' && this.data.rare !== 'pser2'
-      ? '-pendulum'
+    const preset = RARITY_LAYER_PRESETS[this.data.rare.trim().toLowerCase()] || {};
+    const isPendulum = this.data.type === 'pendulum';
+    const effectSuffix = isPendulum && preset.pendulumEffect ? '-pendulum' : '';
+    const rareUrl = preset.effect
+      ? `${this.baseImage}/rare-effect/rare-${preset.effect}${effectSuffix}.png`
       : '';
-    const printSuffix = this.data.type === 'pendulum' ? '-pendulum' : '';
-    const rareUrl = this.data.rare === 'o'
-      ? `${this.baseImage}/card-bleed-rainbow.png`
-      : (this.data.rare ? `${this.baseImage}/rare-${this.data.rare}${suffix}.png` : '');
+    const hrPendulum = isPendulum && preset.effect === 'hr';
+    const hrScaleX = HR_EFFECT_PENDULUM_FRAME.width / HR_EFFECT_SOURCE_FRAME.width;
+    const hrScaleY = HR_EFFECT_PENDULUM_FRAME.height / HR_EFFECT_SOURCE_FRAME.height;
 
     this.rareLeaf.set({
       url: rareUrl,
+      x: hrPendulum
+        ? HR_EFFECT_PENDULUM_FRAME.x - HR_EFFECT_SOURCE_FRAME.x * hrScaleX
+        : 0,
+      y: hrPendulum
+        ? HR_EFFECT_PENDULUM_FRAME.y - HR_EFFECT_SOURCE_FRAME.y * hrScaleY
+        : 0,
+      width: hrPendulum ? this.cardWidth * hrScaleX : this.cardWidth,
+      height: hrPendulum ? this.cardHeight * hrScaleY : this.cardHeight,
       cornerRadius: this.data.radius ? 24 : 0,
-      visible: this.data.rare,
-      zIndex: this.data.rare === 'o' ? 20.5 : 100,
+      visible: Boolean(preset.effect),
+      zIndex: 100,
     });
-    this.rarePrintLeaf.set({
-      url: this.data.rare === 'pser2'
-        ? `${this.baseImage}/rare-pser-print${printSuffix}.png`
+    this.rareCardBorderLeaf.set({
+      url: preset.cardBorder
+        ? `${this.baseImage}/card-border/card-border-${preset.cardBorder}.png`
         : '',
       cornerRadius: this.data.radius ? 24 : 0,
-      visible: this.data.rare === 'pser2',
+      visible: Boolean(preset.cardBorder),
       zIndex: 20.5,
+    });
+    this.rareArtBorderLeaf.set({
+      url: preset.artBorder
+        ? `${this.baseImage}/art-border/art-frame-${preset.artBorder}.png`
+        : '',
+      x: 117,
+      y: 322,
+      visible: Boolean(preset.artBorder) && !isPendulum,
+      zIndex: 20.5,
+    });
+    this.rarePendulumArtBorderLeaf.set({
+      url: preset.pendulumFrame
+        ? `${this.baseImage}/pendulum-frame/pframe-art-${preset.pendulumFrame}.png`
+        : '',
+      x: 68,
+      y: 342,
+      visible: Boolean(preset.pendulumFrame) && isPendulum,
+      zIndex: 20.5,
+    });
+    this.rarePendulumEffectBorderLeaf.set({
+      url: preset.pendulumFrame
+        ? `${this.baseImage}/pendulum-frame/pframe-effect-${preset.pendulumFrame}.png`
+        : '',
+      x: 68,
+      y: 1256,
+      visible: Boolean(preset.pendulumFrame) && isPendulum,
+      zIndex: 22,
+    });
+    this.rareEffectBorderLeaf.set({
+      url: preset.effectBorder
+        ? `${this.baseImage}/effect-border/eblock-border-${preset.effectBorder}.png`
+        : '',
+      x: 77,
+      y: 1501,
+      visible: Boolean(preset.effectBorder) && !isPendulum,
+      zIndex: 29,
     });
   }
 
@@ -738,7 +848,7 @@ export class LegacyYugiohCardRenderer extends Card {
       this.leafer.add(this.attributeRareLeaf);
     }
 
-    const attributeRareUrl = `${this.baseImage}/attribute-rare.png`;
+    const attributeRareUrl = `${this.baseImage}/attribute/attribute-rare.png`;
     this.attributeRareLeaf.set({
       url: attributeRareUrl,
       x: 1163,
@@ -754,7 +864,7 @@ export class LegacyYugiohCardRenderer extends Card {
       this.leafer.add(this.twentiethLeaf);
     }
 
-    const twentiethUrl = `${this.baseImage}/twentieth.png`;
+    const twentiethUrl = `${this.baseImage}/watermark/twentieth.png`;
     this.twentiethLeaf.set({
       url: twentiethUrl,
       x: 472,
@@ -798,11 +908,11 @@ export class LegacyYugiohCardRenderer extends Card {
 
   get cardUrl() {
     if (this.data.type === 'monster') {
-      return `${this.baseImage}/card-${this.data.cardType}.png`;
+      return `${this.baseImage}/card/card-${this.data.cardType}.png`;
     } else if (this.data.type === 'pendulum') {
-      return `${this.baseImage}/card-${this.data.pendulumType}.png`;
+      return `${this.baseImage}/card/card-${this.data.pendulumType}.png`;
     } else {
-      return `${this.baseImage}/card-${this.data.type}.png`;
+      return `${this.baseImage}/card/card-${this.data.type}.png`;
     }
   }
 
@@ -838,9 +948,9 @@ export class LegacyYugiohCardRenderer extends Card {
       if (!this.data.attribute) {
         return '';
       }
-      return `${this.baseImage}/attribute-${this.data.attribute}${suffix}.png`;
+      return `${this.baseImage}/attribute/attribute-${this.data.attribute}${suffix}.png`;
     } else {
-      return `${this.baseImage}/attribute-${this.data.type}${suffix}.png`;
+      return `${this.baseImage}/attribute/attribute-${this.data.type}${suffix}.png`;
     }
   }
 
@@ -939,17 +1049,17 @@ export class LegacyYugiohCardRenderer extends Card {
     let url = '';
     if (this.data.language === 'astral') {
       if ((this.data.type === 'monster' && this.data.cardType !== 'link') || this.data.type === 'pendulum') {
-        url = `${this.baseImage}/atk-def-astral.svg`;
+        url = `${this.baseImage}/text/atk-def-astral.svg`;
       }
       if (this.data.type === 'monster' && this.data.cardType === 'link') {
-        url = `${this.baseImage}/atk-link-astral.svg`;
+        url = `${this.baseImage}/text/atk-link-astral.svg`;
       }
     } else {
       if ((this.data.type === 'monster' && this.data.cardType !== 'link') || this.data.type === 'pendulum') {
-        url = `${this.baseImage}/atk-def.svg`;
+        url = `${this.baseImage}/text/atk-def.svg`;
       }
       if (this.data.type === 'monster' && this.data.cardType === 'link') {
-        url = `${this.baseImage}/atk-link.svg`;
+        url = `${this.baseImage}/text/atk-link.svg`;
       }
     }
     return url;

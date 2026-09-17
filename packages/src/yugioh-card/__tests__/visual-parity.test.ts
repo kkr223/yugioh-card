@@ -1,4 +1,6 @@
 import assert from 'node:assert/strict';
+import { copyFile, mkdir, mkdtemp, rm, symlink } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 import skia from 'skia-canvas';
@@ -48,38 +50,85 @@ async function pixelsFromCard(card: {
   };
 }
 
-test('keeps legacy rendering within the pixel compatibility budget', async () => {
-  const oldCard = new OldYugiohCard({ resourcePath, skia, data });
-  const newCard = new YugiohCard({ resourcePath, skia, data });
-  await newCard.whenReady();
+async function createLegacyResourcePath(): Promise<string> {
+  const legacyResourcePath = await mkdtemp(path.join(tmpdir(), 'yugioh-card-legacy-'));
+  const targetDirectory = path.join(legacyResourcePath, 'yugioh', 'image');
+  await mkdir(targetDirectory, { recursive: true });
+  await symlink(
+    path.join(resourcePath, 'yugioh', 'font'),
+    path.join(legacyResourcePath, 'yugioh', 'font'),
+    process.platform === 'win32' ? 'junction' : 'dir',
+  );
 
-  const [oldImage, newImage] = await Promise.all([
-    pixelsFromCard(oldCard),
-    pixelsFromCard(newCard),
-  ]);
-  assert.equal(newImage.width, oldImage.width);
-  assert.equal(newImage.height, oldImage.height);
-
-  let changedPixels = 0;
-  const pixelCount = oldImage.width * oldImage.height;
-  for (let index = 0; index < oldImage.pixels.length; index += 4) {
-    let changed = false;
-    for (let channel = 0; channel < 4; channel += 1) {
-      if (Math.abs(oldImage.pixels[index + channel] - newImage.pixels[index + channel]) > 8) {
-        changed = true;
-        break;
-      }
-    }
-    if (changed) {
-      changedPixels += 1;
+  const mappings = [
+    ['card/card-normal.png', 'card-normal.png'],
+    ['attribute/attribute-light.png', 'attribute-light.png'],
+    ['attribute/attribute-rare.png', 'attribute-rare.png'],
+    ['level/level.png', 'level.png'],
+    ['level/rank.png', 'rank.png'],
+    ['art-border/art-frame-base.png', 'card-mask.png'],
+    ['text/atk-def.svg', 'atk-def.svg'],
+    ['watermark/twentieth.png', 'twentieth.png'],
+  ];
+  for (const direction of [
+    'up',
+    'right-up',
+    'right',
+    'right-down',
+    'down',
+    'left-down',
+    'left',
+    'left-up',
+  ]) {
+    for (const state of ['on', 'off']) {
+      const fileName = `arrow-${direction}-${state}.png`;
+      mappings.push([`linkmarker/${fileName}`, fileName]);
     }
   }
 
-  oldCard.leafer.destroy();
-  newCard.destroy();
-  assert.ok(
-    changedPixels / pixelCount <= 0.001,
-    `${changedPixels}/${pixelCount} pixels exceeded tolerance`,
-  );
-});
+  await Promise.all(mappings.map(([source, target]) => copyFile(
+    path.join(resourcePath, 'yugioh', 'image', source),
+    path.join(targetDirectory, target),
+  )));
+  return legacyResourcePath;
+}
 
+test('keeps legacy rendering within the pixel compatibility budget', async () => {
+  const legacyResourcePath = await createLegacyResourcePath();
+  try {
+    const oldCard = new OldYugiohCard({ resourcePath: legacyResourcePath, skia, data });
+    const newCard = new YugiohCard({ resourcePath, skia, data });
+    await newCard.whenReady();
+
+    const [oldImage, newImage] = await Promise.all([
+      pixelsFromCard(oldCard),
+      pixelsFromCard(newCard),
+    ]);
+    assert.equal(newImage.width, oldImage.width);
+    assert.equal(newImage.height, oldImage.height);
+
+    let changedPixels = 0;
+    const pixelCount = oldImage.width * oldImage.height;
+    for (let index = 0; index < oldImage.pixels.length; index += 4) {
+      let changed = false;
+      for (let channel = 0; channel < 4; channel += 1) {
+        if (Math.abs(oldImage.pixels[index + channel] - newImage.pixels[index + channel]) > 8) {
+          changed = true;
+          break;
+        }
+      }
+      if (changed) {
+        changedPixels += 1;
+      }
+    }
+
+    oldCard.leafer.destroy();
+    newCard.destroy();
+    assert.ok(
+      changedPixels / pixelCount <= 0.001,
+      `${changedPixels}/${pixelCount} pixels exceeded tolerance`,
+    );
+  } finally {
+    await rm(legacyResourcePath, { recursive: true, force: true });
+  }
+});
