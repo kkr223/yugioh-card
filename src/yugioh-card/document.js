@@ -1,6 +1,6 @@
-import { YUGIOH_FRAME_STYLES as e, getRarityFramePreset as t } from "./rarity.js";
+import { YUGIOH_FRAME_STYLES as e, YUGIOH_RARITY_EFFECTS as t, getRarityFramePreset as n, resolveRarityEffect as r } from "./rarity.js";
 //#region packages/src/yugioh-card/document.ts
-var n = "yugioh-card", r = 1, i = [
+var i = "yugioh-card", a = 1, o = [
 	"sc",
 	"tc",
 	"jp",
@@ -9,12 +9,12 @@ var n = "yugioh-card", r = 1, i = [
 	"astral",
 	"custom1",
 	"custom2"
-], a = [
+], s = [
 	"monster",
 	"spell",
 	"trap",
 	"pendulum"
-], o = [
+], c = [
 	"normal",
 	"effect",
 	"ritual",
@@ -23,7 +23,7 @@ var n = "yugioh-card", r = 1, i = [
 	"xyz",
 	"link",
 	"token"
-], s = [
+], l = [
 	"normal-pendulum",
 	"effect-pendulum",
 	"ritual-pendulum",
@@ -31,31 +31,31 @@ var n = "yugioh-card", r = 1, i = [
 	"synchro-pendulum",
 	"xyz-pendulum",
 	"link-pendulum"
-], c = [
+], u = [
 	"left",
 	"center",
 	"right"
-], l = [
+], d = [
 	"cover",
 	"contain",
 	"stretch"
-], u = [
+], f = [
 	"none",
 	"default",
 	"colored"
-], d = [
+], p = [
 	"before-frame",
 	"after-artwork",
 	"before-text",
 	"after-text",
 	"top"
-], f = class extends Error {
+], m = class extends Error {
 	path;
 	constructor(e, t = "") {
 		super(t ? `${t}: ${e}` : e), this.name = "YugiohCardDocumentError", this.path = t;
 	}
-}, p = {
-	kind: n,
+}, h = {
+	kind: i,
 	version: 1,
 	frame: {
 		language: "sc",
@@ -154,6 +154,7 @@ var n = "yugioh-card", r = 1, i = [
 		copyright: "",
 		laser: "",
 		rare: "",
+		rarityEffect: "auto",
 		twentieth: !1,
 		mark25th: !1
 	},
@@ -162,7 +163,7 @@ var n = "yugioh-card", r = 1, i = [
 		scale: 1
 	}
 };
-function m(e) {
+function g(e) {
 	return {
 		...e,
 		frame: {
@@ -183,12 +184,12 @@ function m(e) {
 		render: { ...e.render }
 	};
 }
-function h(e = {}) {
-	let t = m(p);
+function _(e = {}) {
+	let t = g(h);
 	return {
 		...t,
 		...e,
-		kind: n,
+		kind: i,
 		version: 1,
 		frame: {
 			...t.frame,
@@ -237,285 +238,287 @@ function h(e = {}) {
 		}
 	};
 }
-function g(e) {
+function v(e) {
 	return typeof e == "object" && !!e && !Array.isArray(e);
 }
-function _(e, t) {
+function y(e, t) {
 	let n = e[t];
-	if (!g(n)) throw new f("expected an object", t);
+	if (!v(n)) throw new m("expected an object", t);
 	return n;
 }
-function v(e, t, n) {
-	if (typeof e != "string" || !t.includes(e)) throw new f(`expected one of ${t.join(", ")}`, n);
-	return e;
-}
-function y(e, t) {
-	if (typeof e != "string") throw new f("expected a string", t);
-	return e;
-}
-function b(e, t) {
-	if (typeof e != "number" || !Number.isFinite(e)) throw new f("expected a finite number", t);
+function b(e, t, n) {
+	if (typeof e != "string" || !t.includes(e)) throw new m(`expected one of ${t.join(", ")}`, n);
 	return e;
 }
 function x(e, t) {
-	if (typeof e != "boolean") throw new f("expected a boolean", t);
+	if (typeof e != "string") throw new m("expected a string", t);
 	return e;
 }
-function S(e, t, n, r) {
-	return e === void 0 ? n : v(e, t, r);
+function S(e, t) {
+	if (typeof e != "number" || !Number.isFinite(e)) throw new m("expected a finite number", t);
+	return e;
 }
-function C(e, t, n) {
-	return e === void 0 ? t : x(e, n);
+function C(e, t) {
+	if (typeof e != "boolean") throw new m("expected a boolean", t);
+	return e;
 }
-function w(t) {
-	if (!g(t)) throw new f("expected an object");
-	if (t.kind !== "yugioh-card") throw new f(`expected ${n}`, "kind");
-	if (t.version !== 1) throw new f(`unsupported version ${String(t.version)}`, "version");
-	let r = _(t, "frame"), d = _(t, "title"), m = _(d, "fill"), h = _(d, "shadow"), w = _(t, "artwork"), T = _(t, "foreground"), E = t.rarityMask === void 0 ? p.rarityMask : _(t, "rarityMask"), D = _(t, "effectBox"), O = _(t, "text"), k = _(t, "footer"), A = _(t, "render"), j = r.arrows;
-	if (!Array.isArray(j) || j.some((e) => !Number.isInteger(e) || e < 1 || e > 8)) throw new f("expected integers from 1 to 8", "frame.arrows");
+function w(e, t, n, r) {
+	return e === void 0 ? n : b(e, t, r);
+}
+function T(e, t, n) {
+	return e === void 0 ? t : C(e, n);
+}
+function E(n) {
+	if (!v(n)) throw new m("expected an object");
+	if (n.kind !== "yugioh-card") throw new m(`expected ${i}`, "kind");
+	if (n.version !== 1) throw new m(`unsupported version ${String(n.version)}`, "version");
+	let r = y(n, "frame"), a = y(n, "title"), p = y(a, "fill"), g = y(a, "shadow"), _ = y(n, "artwork"), E = y(n, "foreground"), D = n.rarityMask === void 0 ? h.rarityMask : y(n, "rarityMask"), O = y(n, "effectBox"), k = y(n, "text"), A = y(n, "footer"), j = y(n, "render"), M = r.arrows;
+	if (!Array.isArray(M) || M.some((e) => !Number.isInteger(e) || e < 1 || e > 8)) throw new m("expected integers from 1 to 8", "frame.arrows");
 	return {
-		kind: n,
+		kind: i,
 		version: 1,
 		frame: {
-			language: v(r.language, i, "frame.language"),
-			font: v(r.font, [
+			language: b(r.language, o, "frame.language"),
+			font: b(r.font, [
 				"",
 				"custom1",
 				"custom2"
 			], "frame.font"),
-			type: v(r.type, a, "frame.type"),
-			attribute: y(r.attribute, "frame.attribute"),
-			icon: y(r.icon, "frame.icon"),
-			cardType: v(r.cardType, o, "frame.cardType"),
-			pendulumType: v(r.pendulumType, s, "frame.pendulumType"),
-			level: b(r.level, "frame.level"),
-			rank: b(r.rank, "frame.rank"),
-			pendulumScale: b(r.pendulumScale, "frame.pendulumScale"),
-			arrows: [...j],
-			nameBlock: C(r.nameBlock, !1, "frame.nameBlock"),
-			cardBorderStyle: v(r.cardBorderStyle ?? "auto", e, "frame.cardBorderStyle"),
-			artBorderStyle: v(r.artBorderStyle ?? "auto", e, "frame.artBorderStyle"),
-			effectBorderStyle: v(r.effectBorderStyle ?? "auto", e, "frame.effectBorderStyle")
+			type: b(r.type, s, "frame.type"),
+			attribute: x(r.attribute, "frame.attribute"),
+			icon: x(r.icon, "frame.icon"),
+			cardType: b(r.cardType, c, "frame.cardType"),
+			pendulumType: b(r.pendulumType, l, "frame.pendulumType"),
+			level: S(r.level, "frame.level"),
+			rank: S(r.rank, "frame.rank"),
+			pendulumScale: S(r.pendulumScale, "frame.pendulumScale"),
+			arrows: [...M],
+			nameBlock: T(r.nameBlock, !1, "frame.nameBlock"),
+			cardBorderStyle: b(r.cardBorderStyle ?? "auto", e, "frame.cardBorderStyle"),
+			artBorderStyle: b(r.artBorderStyle ?? "auto", e, "frame.artBorderStyle"),
+			effectBorderStyle: b(r.effectBorderStyle ?? "auto", e, "frame.effectBorderStyle")
 		},
 		title: {
-			text: y(d.text, "title.text"),
-			align: v(d.align, c, "title.align"),
+			text: x(a.text, "title.text"),
+			align: b(a.align, u, "title.align"),
 			fill: {
-				color: y(m.color, "title.fill.color"),
-				gradient: x(m.gradient, "title.fill.gradient"),
-				gradientStroke: C(m.gradientStroke, !0, "title.fill.gradientStroke"),
-				gradientColor1: y(m.gradientColor1, "title.fill.gradientColor1"),
-				gradientColor2: y(m.gradientColor2, "title.fill.gradientColor2")
+				color: x(p.color, "title.fill.color"),
+				gradient: C(p.gradient, "title.fill.gradient"),
+				gradientStroke: T(p.gradientStroke, !0, "title.fill.gradientStroke"),
+				gradientColor1: x(p.gradientColor1, "title.fill.gradientColor1"),
+				gradientColor2: x(p.gradientColor2, "title.fill.gradientColor2")
 			},
 			shadow: {
-				enabled: x(h.enabled, "title.shadow.enabled"),
-				color: y(h.color, "title.shadow.color"),
-				gradient: x(h.gradient, "title.shadow.gradient"),
-				gradientColor1: y(h.gradientColor1, "title.shadow.gradientColor1"),
-				gradientColor2: y(h.gradientColor2, "title.shadow.gradientColor2"),
-				offsetX: b(h.offsetX, "title.shadow.offsetX"),
-				offsetY: b(h.offsetY, "title.shadow.offsetY"),
-				opacity: b(h.opacity, "title.shadow.opacity")
+				enabled: C(g.enabled, "title.shadow.enabled"),
+				color: x(g.color, "title.shadow.color"),
+				gradient: C(g.gradient, "title.shadow.gradient"),
+				gradientColor1: x(g.gradientColor1, "title.shadow.gradientColor1"),
+				gradientColor2: x(g.gradientColor2, "title.shadow.gradientColor2"),
+				offsetX: S(g.offsetX, "title.shadow.offsetX"),
+				offsetY: S(g.offsetY, "title.shadow.offsetY"),
+				opacity: S(g.opacity, "title.shadow.opacity")
 			},
-			useRarityPreset: x(d.useRarityPreset, "title.useRarityPreset")
+			useRarityPreset: C(a.useRarityPreset, "title.useRarityPreset")
 		},
 		artwork: {
-			source: y(w.source, "artwork.source"),
-			fit: v(w.fit, l, "artwork.fit")
+			source: x(_.source, "artwork.source"),
+			fit: b(_.fit, d, "artwork.fit")
 		},
 		foreground: {
-			enabled: x(T.enabled, "foreground.enabled"),
-			source: y(T.source, "foreground.source"),
-			width: b(T.width, "foreground.width"),
-			height: b(T.height, "foreground.height"),
-			x: b(T.x, "foreground.x"),
-			y: b(T.y, "foreground.y"),
-			scale: b(T.scale, "foreground.scale"),
-			rotation: b(T.rotation, "foreground.rotation"),
-			coverLevel: C(T.coverLevel, !0, "foreground.coverLevel"),
-			coverAttribute: C(T.coverAttribute, !0, "foreground.coverAttribute"),
-			clipBelowEffectBox: C(T.clipBelowEffectBox, !1, "foreground.clipBelowEffectBox")
+			enabled: C(E.enabled, "foreground.enabled"),
+			source: x(E.source, "foreground.source"),
+			width: S(E.width, "foreground.width"),
+			height: S(E.height, "foreground.height"),
+			x: S(E.x, "foreground.x"),
+			y: S(E.y, "foreground.y"),
+			scale: S(E.scale, "foreground.scale"),
+			rotation: S(E.rotation, "foreground.rotation"),
+			coverLevel: T(E.coverLevel, !0, "foreground.coverLevel"),
+			coverAttribute: T(E.coverAttribute, !0, "foreground.coverAttribute"),
+			clipBelowEffectBox: T(E.clipBelowEffectBox, !1, "foreground.clipBelowEffectBox")
 		},
 		rarityMask: {
-			source: y(E.source, "rarityMask.source"),
-			width: b(E.width, "rarityMask.width"),
-			height: b(E.height, "rarityMask.height"),
-			x: b(E.x, "rarityMask.x"),
-			y: b(E.y, "rarityMask.y"),
-			scale: b(E.scale, "rarityMask.scale"),
-			maskEffectBox: C(E.maskEffectBox, !0, "rarityMask.maskEffectBox"),
-			maskArtwork: C(E.maskArtwork, !1, "rarityMask.maskArtwork"),
-			coverName: C(E.coverName, !1, "rarityMask.coverName"),
-			coverAttribute: C(E.coverAttribute, !1, "rarityMask.coverAttribute"),
-			coverLevel: C(E.coverLevel, !1, "rarityMask.coverLevel")
+			source: x(D.source, "rarityMask.source"),
+			width: S(D.width, "rarityMask.width"),
+			height: S(D.height, "rarityMask.height"),
+			x: S(D.x, "rarityMask.x"),
+			y: S(D.y, "rarityMask.y"),
+			scale: S(D.scale, "rarityMask.scale"),
+			maskEffectBox: T(D.maskEffectBox, !0, "rarityMask.maskEffectBox"),
+			maskArtwork: T(D.maskArtwork, !1, "rarityMask.maskArtwork"),
+			coverName: T(D.coverName, !1, "rarityMask.coverName"),
+			coverAttribute: T(D.coverAttribute, !1, "rarityMask.coverAttribute"),
+			coverLevel: T(D.coverLevel, !1, "rarityMask.coverLevel")
 		},
 		effectBox: {
-			enabled: x(D.enabled, "effectBox.enabled"),
-			x: b(D.x, "effectBox.x"),
-			y: b(D.y, "effectBox.y"),
-			width: b(D.width, "effectBox.width"),
-			height: b(D.height, "effectBox.height"),
-			color: y(D.color, "effectBox.color"),
-			opacity: b(D.opacity, "effectBox.opacity"),
-			borderStyle: S(D.borderStyle, u, "none", "effectBox.borderStyle")
+			enabled: C(O.enabled, "effectBox.enabled"),
+			x: S(O.x, "effectBox.x"),
+			y: S(O.y, "effectBox.y"),
+			width: S(O.width, "effectBox.width"),
+			height: S(O.height, "effectBox.height"),
+			color: x(O.color, "effectBox.color"),
+			opacity: S(O.opacity, "effectBox.opacity"),
+			borderStyle: w(O.borderStyle, f, "none", "effectBox.borderStyle")
 		},
 		text: {
-			pendulumDescription: y(O.pendulumDescription, "text.pendulumDescription"),
-			monsterType: y(O.monsterType, "text.monsterType"),
-			description: y(O.description, "text.description"),
-			firstLineCompress: x(O.firstLineCompress, "text.firstLineCompress"),
-			descriptionAlign: x(O.descriptionAlign, "text.descriptionAlign"),
-			descriptionZoom: b(O.descriptionZoom, "text.descriptionZoom"),
-			descriptionWeight: b(O.descriptionWeight, "text.descriptionWeight"),
-			showAtkBar: x(O.showAtkBar, "text.showAtkBar"),
-			atk: b(O.atk, "text.atk"),
-			def: b(O.def, "text.def")
+			pendulumDescription: x(k.pendulumDescription, "text.pendulumDescription"),
+			monsterType: x(k.monsterType, "text.monsterType"),
+			description: x(k.description, "text.description"),
+			firstLineCompress: C(k.firstLineCompress, "text.firstLineCompress"),
+			descriptionAlign: C(k.descriptionAlign, "text.descriptionAlign"),
+			descriptionZoom: S(k.descriptionZoom, "text.descriptionZoom"),
+			descriptionWeight: S(k.descriptionWeight, "text.descriptionWeight"),
+			showAtkBar: C(k.showAtkBar, "text.showAtkBar"),
+			atk: S(k.atk, "text.atk"),
+			def: S(k.def, "text.def")
 		},
 		footer: {
-			package: y(k.package, "footer.package"),
-			password: y(k.password, "footer.password"),
-			copyright: y(k.copyright, "footer.copyright"),
-			laser: y(k.laser, "footer.laser"),
-			rare: y(k.rare, "footer.rare"),
-			twentieth: x(k.twentieth, "footer.twentieth"),
-			mark25th: C(k.mark25th, !1, "footer.mark25th")
+			package: x(A.package, "footer.package"),
+			password: x(A.password, "footer.password"),
+			copyright: x(A.copyright, "footer.copyright"),
+			laser: x(A.laser, "footer.laser"),
+			rare: x(A.rare, "footer.rare"),
+			rarityEffect: b(A.rarityEffect ?? "auto", t, "footer.rarityEffect"),
+			twentieth: C(A.twentieth, "footer.twentieth"),
+			mark25th: T(A.mark25th, !1, "footer.mark25th")
 		},
 		render: {
-			radius: x(A.radius, "render.radius"),
-			scale: b(A.scale, "render.scale")
+			radius: C(j.radius, "render.radius"),
+			scale: S(j.scale, "render.scale")
 		}
 	};
 }
-function T(e, t) {
+function D(e, t) {
 	return typeof e == "string" ? e : t;
 }
-function E(e, t) {
+function O(e, t) {
 	return typeof e == "number" && Number.isFinite(e) ? e : t;
 }
-function D(e, t) {
+function k(e, t) {
 	return typeof e == "boolean" ? e : t;
 }
-function O(e, t, n) {
+function A(e, t, n) {
 	return typeof e == "string" && t.includes(e) ? e : n;
 }
-function k(e, t) {
-	return typeof e.effectBlockBorderStyle == "string" ? e.effectBlockBorderStyle === "o" || e.effectBlockBorderStyle === "alternate" ? "colored" : O(e.effectBlockBorderStyle, u, t) : typeof e.effectBlockBorder == "boolean" ? e.effectBlockBorder ? "default" : "none" : t;
+function j(e, t) {
+	return typeof e.effectBlockBorderStyle == "string" ? e.effectBlockBorderStyle === "o" || e.effectBlockBorderStyle === "alternate" ? "colored" : A(e.effectBlockBorderStyle, f, t) : typeof e.effectBlockBorder == "boolean" ? e.effectBlockBorder ? "default" : "none" : t;
 }
-function A(t = {}, n = h()) {
-	let r = T(t.nameShadowColor, n.title.shadow.color), u = T(t.foregroundImage, n.foreground.source), d = T(t.rarityMaskImage, n.rarityMask.source), f = Array.isArray(t.arrowList) ? t.arrowList.filter((e) => Number.isInteger(e) && e >= 1 && e <= 8) : n.frame.arrows;
-	return h({
+function M(n = {}, r = _()) {
+	let i = D(n.nameShadowColor, r.title.shadow.color), a = D(n.foregroundImage, r.foreground.source), f = D(n.rarityMaskImage, r.rarityMask.source), p = Array.isArray(n.arrowList) ? n.arrowList.filter((e) => Number.isInteger(e) && e >= 1 && e <= 8) : r.frame.arrows;
+	return _({
 		frame: {
-			language: O(t.language, i, n.frame.language),
-			font: O(t.font, [
+			language: A(n.language, o, r.frame.language),
+			font: A(n.font, [
 				"",
 				"custom1",
 				"custom2"
-			], n.frame.font),
-			type: O(t.type, a, n.frame.type),
-			attribute: T(t.attribute, n.frame.attribute),
-			icon: T(t.icon, n.frame.icon),
-			cardType: O(t.cardType, o, n.frame.cardType),
-			pendulumType: O(t.pendulumType, s, n.frame.pendulumType),
-			level: E(t.level, n.frame.level),
-			rank: E(t.rank, n.frame.rank),
-			pendulumScale: E(t.pendulumScale, n.frame.pendulumScale),
-			arrows: f,
-			cardBorderStyle: O(t.cardBorderStyle, e, n.frame.cardBorderStyle),
-			artBorderStyle: O(t.artBorderStyle, e, n.frame.artBorderStyle),
-			effectBorderStyle: O(t.effectBorderStyle, e, n.frame.effectBorderStyle),
-			nameBlock: D(t.nameBlock ?? t.outFrameNameBlock ?? t.outFrameNameBlockEnabled, n.frame.nameBlock)
+			], r.frame.font),
+			type: A(n.type, s, r.frame.type),
+			attribute: D(n.attribute, r.frame.attribute),
+			icon: D(n.icon, r.frame.icon),
+			cardType: A(n.cardType, c, r.frame.cardType),
+			pendulumType: A(n.pendulumType, l, r.frame.pendulumType),
+			level: O(n.level, r.frame.level),
+			rank: O(n.rank, r.frame.rank),
+			pendulumScale: O(n.pendulumScale, r.frame.pendulumScale),
+			arrows: p,
+			cardBorderStyle: A(n.cardBorderStyle, e, r.frame.cardBorderStyle),
+			artBorderStyle: A(n.artBorderStyle, e, r.frame.artBorderStyle),
+			effectBorderStyle: A(n.effectBorderStyle, e, r.frame.effectBorderStyle),
+			nameBlock: k(n.nameBlock ?? n.outFrameNameBlock ?? n.outFrameNameBlockEnabled, r.frame.nameBlock)
 		},
 		title: {
-			text: T(t.name, n.title.text),
-			align: O(t.align, c, n.title.align),
+			text: D(n.name, r.title.text),
+			align: A(n.align, u, r.title.align),
 			fill: {
-				color: T(t.color, n.title.fill.color),
-				gradient: D(t.gradient, n.title.fill.gradient),
-				gradientStroke: D(t.gradientStroke, n.title.fill.gradientStroke),
-				gradientColor1: T(t.gradientColor1, n.title.fill.gradientColor1),
-				gradientColor2: T(t.gradientColor2, n.title.fill.gradientColor2)
+				color: D(n.color, r.title.fill.color),
+				gradient: k(n.gradient, r.title.fill.gradient),
+				gradientStroke: k(n.gradientStroke, r.title.fill.gradientStroke),
+				gradientColor1: D(n.gradientColor1, r.title.fill.gradientColor1),
+				gradientColor2: D(n.gradientColor2, r.title.fill.gradientColor2)
 			},
 			shadow: {
-				enabled: !!(r || t.nameShadowGradient || n.title.shadow.enabled),
-				color: r,
-				gradient: D(t.nameShadowGradient, n.title.shadow.gradient),
-				gradientColor1: T(t.nameShadowGradientColor1, n.title.shadow.gradientColor1),
-				gradientColor2: T(t.nameShadowGradientColor2, n.title.shadow.gradientColor2),
-				offsetX: E(t.nameShadowOffsetX, n.title.shadow.offsetX),
-				offsetY: E(t.nameShadowOffsetY, n.title.shadow.offsetY),
-				opacity: E(t.nameShadowOpacity, n.title.shadow.opacity)
+				enabled: !!(i || n.nameShadowGradient || r.title.shadow.enabled),
+				color: i,
+				gradient: k(n.nameShadowGradient, r.title.shadow.gradient),
+				gradientColor1: D(n.nameShadowGradientColor1, r.title.shadow.gradientColor1),
+				gradientColor2: D(n.nameShadowGradientColor2, r.title.shadow.gradientColor2),
+				offsetX: O(n.nameShadowOffsetX, r.title.shadow.offsetX),
+				offsetY: O(n.nameShadowOffsetY, r.title.shadow.offsetY),
+				opacity: O(n.nameShadowOpacity, r.title.shadow.opacity)
 			},
-			useRarityPreset: D(t.useRarityPreset, n.title.useRarityPreset)
+			useRarityPreset: k(n.useRarityPreset, r.title.useRarityPreset)
 		},
 		artwork: {
-			source: T(t.image, n.artwork.source),
-			fit: O(t.artworkFit, l, n.artwork.fit)
+			source: D(n.image, r.artwork.source),
+			fit: A(n.artworkFit, d, r.artwork.fit)
 		},
 		foreground: {
-			enabled: !!u,
-			source: u,
-			width: E(t.foregroundWidth, n.foreground.width),
-			height: E(t.foregroundHeight, n.foreground.height),
-			x: E(t.foregroundX, n.foreground.x),
-			y: E(t.foregroundY, n.foreground.y),
-			scale: E(t.foregroundScale, n.foreground.scale),
-			rotation: E(t.foregroundRotation, n.foreground.rotation),
-			coverLevel: D(t.foregroundCoverLevel, n.foreground.coverLevel),
-			coverAttribute: D(t.foregroundCoverAttribute, n.foreground.coverAttribute),
-			clipBelowEffectBox: D(t.foregroundClipBelowEffectBox, n.foreground.clipBelowEffectBox)
+			enabled: !!a,
+			source: a,
+			width: O(n.foregroundWidth, r.foreground.width),
+			height: O(n.foregroundHeight, r.foreground.height),
+			x: O(n.foregroundX, r.foreground.x),
+			y: O(n.foregroundY, r.foreground.y),
+			scale: O(n.foregroundScale, r.foreground.scale),
+			rotation: O(n.foregroundRotation, r.foreground.rotation),
+			coverLevel: k(n.foregroundCoverLevel, r.foreground.coverLevel),
+			coverAttribute: k(n.foregroundCoverAttribute, r.foreground.coverAttribute),
+			clipBelowEffectBox: k(n.foregroundClipBelowEffectBox, r.foreground.clipBelowEffectBox)
 		},
 		rarityMask: {
-			source: d,
-			width: E(t.rarityMaskWidth, n.rarityMask.width),
-			height: E(t.rarityMaskHeight, n.rarityMask.height),
-			x: E(t.rarityMaskX, n.rarityMask.x),
-			y: E(t.rarityMaskY, n.rarityMask.y),
-			scale: E(t.rarityMaskScale, n.rarityMask.scale),
-			maskEffectBox: D(t.rarityMaskEffectBox, n.rarityMask.maskEffectBox),
-			maskArtwork: D(t.rarityMaskArtwork, n.rarityMask.maskArtwork),
-			coverName: D(t.rarityMaskCoverName, n.rarityMask.coverName),
-			coverAttribute: D(t.rarityMaskCoverAttribute, n.rarityMask.coverAttribute),
-			coverLevel: D(t.rarityMaskCoverLevel, n.rarityMask.coverLevel)
+			source: f,
+			width: O(n.rarityMaskWidth, r.rarityMask.width),
+			height: O(n.rarityMaskHeight, r.rarityMask.height),
+			x: O(n.rarityMaskX, r.rarityMask.x),
+			y: O(n.rarityMaskY, r.rarityMask.y),
+			scale: O(n.rarityMaskScale, r.rarityMask.scale),
+			maskEffectBox: k(n.rarityMaskEffectBox, r.rarityMask.maskEffectBox),
+			maskArtwork: k(n.rarityMaskArtwork, r.rarityMask.maskArtwork),
+			coverName: k(n.rarityMaskCoverName, r.rarityMask.coverName),
+			coverAttribute: k(n.rarityMaskCoverAttribute, r.rarityMask.coverAttribute),
+			coverLevel: k(n.rarityMaskCoverLevel, r.rarityMask.coverLevel)
 		},
 		effectBox: {
-			enabled: D(t.effectBlockEnabled, n.effectBox.enabled),
-			x: E(t.effectBlockX, n.effectBox.x),
-			y: E(t.effectBlockY, n.effectBox.y),
-			width: E(t.effectBlockWidth, n.effectBox.width),
-			height: E(t.effectBlockHeight, n.effectBox.height),
-			color: T(t.effectBlockColor, n.effectBox.color),
-			opacity: E(t.effectBlockOpacity, n.effectBox.opacity),
-			borderStyle: k(t, n.effectBox.borderStyle)
+			enabled: k(n.effectBlockEnabled, r.effectBox.enabled),
+			x: O(n.effectBlockX, r.effectBox.x),
+			y: O(n.effectBlockY, r.effectBox.y),
+			width: O(n.effectBlockWidth, r.effectBox.width),
+			height: O(n.effectBlockHeight, r.effectBox.height),
+			color: D(n.effectBlockColor, r.effectBox.color),
+			opacity: O(n.effectBlockOpacity, r.effectBox.opacity),
+			borderStyle: j(n, r.effectBox.borderStyle)
 		},
 		text: {
-			pendulumDescription: T(t.pendulumDescription, n.text.pendulumDescription),
-			monsterType: T(t.monsterType, n.text.monsterType),
-			description: T(t.description, n.text.description),
-			firstLineCompress: D(t.firstLineCompress, n.text.firstLineCompress),
-			descriptionAlign: D(t.descriptionAlign, n.text.descriptionAlign),
-			descriptionZoom: E(t.descriptionZoom, n.text.descriptionZoom),
-			descriptionWeight: E(t.descriptionWeight, n.text.descriptionWeight),
-			showAtkBar: D(t.atkBar, n.text.showAtkBar),
-			atk: E(t.atk, n.text.atk),
-			def: E(t.def, n.text.def)
+			pendulumDescription: D(n.pendulumDescription, r.text.pendulumDescription),
+			monsterType: D(n.monsterType, r.text.monsterType),
+			description: D(n.description, r.text.description),
+			firstLineCompress: k(n.firstLineCompress, r.text.firstLineCompress),
+			descriptionAlign: k(n.descriptionAlign, r.text.descriptionAlign),
+			descriptionZoom: O(n.descriptionZoom, r.text.descriptionZoom),
+			descriptionWeight: O(n.descriptionWeight, r.text.descriptionWeight),
+			showAtkBar: k(n.atkBar, r.text.showAtkBar),
+			atk: O(n.atk, r.text.atk),
+			def: O(n.def, r.text.def)
 		},
 		footer: {
-			package: T(t.package, n.footer.package),
-			password: T(t.password, n.footer.password),
-			copyright: T(t.copyright, n.footer.copyright),
-			laser: T(t.laser, n.footer.laser),
-			rare: T(t.rare, n.footer.rare),
-			twentieth: D(t.twentieth, n.footer.twentieth),
-			mark25th: D(t.mark25th ?? t.twentyFifth, n.footer.mark25th)
+			package: D(n.package, r.footer.package),
+			password: D(n.password, r.footer.password),
+			copyright: D(n.copyright, r.footer.copyright),
+			laser: D(n.laser, r.footer.laser),
+			rare: D(n.rare, r.footer.rare),
+			rarityEffect: A(n.rarityEffect, t, r.footer.rarityEffect),
+			twentieth: k(n.twentieth, r.footer.twentieth),
+			mark25th: k(n.mark25th ?? n.twentyFifth, r.footer.mark25th)
 		},
 		render: {
-			radius: D(t.radius, n.render.radius),
-			scale: E(t.scale, n.render.scale)
+			radius: k(n.radius, r.render.radius),
+			scale: O(n.scale, r.render.scale)
 		}
 	});
 }
-function j(e) {
-	let t = w(e);
+function N(e) {
+	let t = E(e);
 	return {
 		language: t.frame.language,
 		font: t.frame.font,
@@ -566,6 +569,7 @@ function j(e) {
 		copyright: t.footer.copyright,
 		laser: t.footer.laser,
 		rare: t.footer.rare,
+		rarityEffect: t.footer.rarityEffect,
 		twentieth: t.footer.twentieth,
 		mark25th: t.footer.mark25th,
 		twentyFifth: t.footer.mark25th,
@@ -604,4 +608,4 @@ function j(e) {
 	};
 }
 //#endregion
-export { l as YUGIOH_ARTWORK_FITS, n as YUGIOH_CARD_DOCUMENT_KIND, r as YUGIOH_CARD_DOCUMENT_VERSION, i as YUGIOH_CARD_LANGUAGES, a as YUGIOH_CARD_TYPES, u as YUGIOH_EFFECT_BOX_BORDER_STYLES, e as YUGIOH_FRAME_STYLES, d as YUGIOH_LAYER_SLOTS, o as YUGIOH_MONSTER_CARD_TYPES, s as YUGIOH_PENDULUM_CARD_TYPES, c as YUGIOH_TITLE_ALIGNS, f as YugiohCardDocumentError, h as createYugiohCardDocument, t as getRarityFramePreset, A as legacyDataToYugiohCardDocument, w as parseYugiohCardDocument, j as yugiohCardDocumentToLegacyData };
+export { d as YUGIOH_ARTWORK_FITS, i as YUGIOH_CARD_DOCUMENT_KIND, a as YUGIOH_CARD_DOCUMENT_VERSION, o as YUGIOH_CARD_LANGUAGES, s as YUGIOH_CARD_TYPES, f as YUGIOH_EFFECT_BOX_BORDER_STYLES, e as YUGIOH_FRAME_STYLES, p as YUGIOH_LAYER_SLOTS, c as YUGIOH_MONSTER_CARD_TYPES, l as YUGIOH_PENDULUM_CARD_TYPES, t as YUGIOH_RARITY_EFFECTS, u as YUGIOH_TITLE_ALIGNS, m as YugiohCardDocumentError, _ as createYugiohCardDocument, n as getRarityFramePreset, M as legacyDataToYugiohCardDocument, E as parseYugiohCardDocument, r as resolveRarityEffect, N as yugiohCardDocumentToLegacyData };

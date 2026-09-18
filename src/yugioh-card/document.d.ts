@@ -1,4 +1,5 @@
-import { YugiohFrameStyle } from './rarity.js';
+import { YugiohFrameStyle, YugiohRarityEffect } from './rarity.js';
+export { YUGIOH_RARITY_EFFECTS, resolveRarityEffect, type YugiohRarityEffect } from './rarity.js';
 export { YUGIOH_FRAME_STYLES, getRarityFramePreset, type YugiohFrameStyle } from './rarity.js';
 export declare const YUGIOH_CARD_DOCUMENT_KIND: "yugioh-card";
 export declare const YUGIOH_CARD_DOCUMENT_VERSION: 1;
@@ -119,6 +120,7 @@ export interface YugiohCardDocument {
         copyright: string;
         laser: string;
         rare: string;
+        rarityEffect: YugiohRarityEffect;
         twentieth: boolean;
         mark25th: boolean;
     };
@@ -177,6 +179,7 @@ export interface LegacyYugiohCardData {
     copyright?: string;
     laser?: string;
     rare?: string;
+    rarityEffect?: string;
     twentieth?: boolean;
     radius?: boolean;
     scale?: number;

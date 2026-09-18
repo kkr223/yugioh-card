@@ -105,6 +105,10 @@ They live under `frame` in structured documents. `auto` preserves legacy rarity
 behavior; `default` explicitly uses the base frame even when a rarity is selected.
 `getRarityFramePreset(rare, type)` from `yugioh-card-ts/document` returns explicit
 frame choices for editors that apply rarity once, then allow individual edits.
+It also returns `rarityEffect`: `none`, `dt`, `ur`, `ur-pendulum`, `hr`, `ser`,
+`ser-pendulum`, or `pser2`. Set this flat field (or `footer.rarityEffect` in a
+document) to change the effect independently. `auto` retains legacy preset
+selection. Masks, blending and effect coverage follow the selected effect.
 Ordinary effect frames support default/color; pendulum artwork and effect frames
 support default/silver/gold. A color choice carried over to pendulum uses gold;
 silver/gold effect choices carried over to an ordinary card use its default frame.

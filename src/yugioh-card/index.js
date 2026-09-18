@@ -1,22 +1,22 @@
 import { CompressText as e } from "../compress-text/compress-text.js";
-import "./rarity.js";
-import { YUGIOH_LAYER_SLOTS as t, createYugiohCardDocument as n, legacyDataToYugiohCardDocument as r, parseYugiohCardDocument as i, yugiohCardDocumentToLegacyData as a } from "./document.js";
-import { LegacyYugiohCardRenderer as o } from "./legacy-renderer.js";
-import { Box as s, Group as c, Image as l, Rect as u } from "leafer-unified";
+import { resolveRarityEffect as t } from "./rarity.js";
+import { YUGIOH_LAYER_SLOTS as n, createYugiohCardDocument as r, legacyDataToYugiohCardDocument as i, parseYugiohCardDocument as a, yugiohCardDocumentToLegacyData as o } from "./document.js";
+import { LegacyYugiohCardRenderer as s } from "./legacy-renderer.js";
+import { Box as c, Group as l, Image as u, Rect as d } from "leafer-unified";
 //#region packages/src/yugioh-card/index.ts
-var d = class extends Error {
+var f = class extends Error {
 	revision;
 	cause;
 	constructor(e, t) {
 		super(`Failed to render YugiohCard revision ${e}`), this.name = "YugiohCardRenderError", this.revision = e, this.cause = t;
 	}
-}, f = {
+}, p = {
 	"before-frame": -100,
 	"after-artwork": 25,
 	"before-text": 29,
 	"after-text": 90,
 	top: 1e3
-}, p = {
+}, m = {
 	ur: {
 		color: "#f3cc63",
 		gradient: !0,
@@ -59,7 +59,7 @@ var d = class extends Error {
 		gradientColor1: "#855f86",
 		gradientColor2: "#fff5fd"
 	}
-}, m = {
+}, h = {
 	nameBlock: {
 		url: "/yugioh/image/other/name-block.png",
 		x: 76,
@@ -78,7 +78,7 @@ var d = class extends Error {
 		width: 388,
 		height: 430
 	}
-}, h = {
+}, g = {
 	normal: {
 		url: "/yugioh/image/art-border/art-frame-base.png",
 		x: 117,
@@ -100,7 +100,7 @@ var d = class extends Error {
 		width: 1257,
 		height: 681
 	}
-}, g = [
+}, _ = [
 	"name",
 	"pendulumDescription",
 	"monsterType",
@@ -108,17 +108,17 @@ var d = class extends Error {
 	"package",
 	"password"
 ];
-function _(e) {
-	if (!(e.language !== "sc" && e.language !== "tc")) for (let t of g) e[t] = e[t].replace(/[０-９]/g, (e) => String.fromCharCode(e.charCodeAt(0) - 65248));
-}
 function v(e) {
-	let t = i(e);
-	return Object.freeze(t.frame.arrows), Object.freeze(t.frame), Object.freeze(t.title.fill), Object.freeze(t.title.shadow), Object.freeze(t.title), Object.freeze(t.artwork), Object.freeze(t.foreground), Object.freeze(t.rarityMask), Object.freeze(t.effectBox), Object.freeze(t.text), Object.freeze(t.footer), Object.freeze(t.render), Object.freeze(t);
+	if (!(e.language !== "sc" && e.language !== "tc")) for (let t of _) e[t] = e[t].replace(/[０-９]/g, (e) => String.fromCharCode(e.charCodeAt(0) - 65248));
 }
 function y(e) {
+	let t = a(e);
+	return Object.freeze(t.frame.arrows), Object.freeze(t.frame), Object.freeze(t.title.fill), Object.freeze(t.title.shadow), Object.freeze(t.title), Object.freeze(t.artwork), Object.freeze(t.foreground), Object.freeze(t.rarityMask), Object.freeze(t.effectBox), Object.freeze(t.text), Object.freeze(t.footer), Object.freeze(t.render), Object.freeze(t);
+}
+function b(e) {
 	return typeof e == "object" && !!e && "then" in e && typeof e.then == "function";
 }
-var b = class extends o {
+var x = class extends s {
 	documentValue;
 	revisionValue = 0;
 	completedRevision = 0;
@@ -142,7 +142,7 @@ var b = class extends o {
 	effectBoxBorderLeaf = null;
 	mark25thLeaf = null;
 	constructor(e = {}) {
-		super(e), this.documentValue = e.document ? i(e.document) : r(e.data), this.data = a(this.documentValue), this.initializeSlotGroups();
+		super(e), this.documentValue = e.document ? a(e.document) : i(e.data), this.data = o(this.documentValue), this.initializeSlotGroups();
 		for (let t of e.extensions ?? []) this.registerExtension(t);
 		this.scheduleRender();
 	}
@@ -157,24 +157,24 @@ var b = class extends o {
 			super.setData(e);
 			return;
 		}
-		this.documentValue = r(e, this.documentValue), this.data = a(this.documentValue), this.scheduleRender();
+		this.documentValue = i(e, this.documentValue), this.data = o(this.documentValue), this.scheduleRender();
 	}
 	async setDocument(e) {
-		this.assertActive(), this.documentValue = i(e), this.data = a(this.documentValue), await this.scheduleRender();
+		this.assertActive(), this.documentValue = a(e), this.data = o(this.documentValue), await this.scheduleRender();
 	}
 	async updateDocument(e) {
 		await this.setDocument(e(this.getDocument()));
 	}
 	getDocument() {
-		return v(this.documentValue ?? n());
+		return y(this.documentValue ?? r());
 	}
 	registerExtension(e) {
-		if (this.assertActive(), !t.includes(e.slot)) throw Error(`Unknown YugiohCard layer slot: ${String(e.slot)}`);
+		if (this.assertActive(), !n.includes(e.slot)) throw Error(`Unknown YugiohCard layer slot: ${String(e.slot)}`);
 		if (this.extensions.has(e.id)) throw Error(`Duplicate YugiohCard extension id: ${e.id}`);
-		let n = this.slotGroups.get(e.slot);
-		if (!n) throw Error(`Layer slot is not initialized: ${e.slot}`);
-		let r = new c();
-		n.add(r), this.extensions.set(e.id, {
+		let t = this.slotGroups.get(e.slot);
+		if (!t) throw Error(`Layer slot is not initialized: ${e.slot}`);
+		let r = new l();
+		t.add(r), this.extensions.set(e.id, {
 			extension: e,
 			group: r
 		}), this.scheduleRender();
@@ -214,8 +214,8 @@ var b = class extends o {
 	}
 	initializeSlotGroups() {
 		if (!this.leafer) throw Error("YugiohCard renderer is not initialized");
-		for (let e of t) {
-			let t = new c({ zIndex: f[e] });
+		for (let e of n) {
+			let t = new l({ zIndex: p[e] });
 			this.leafer.add(t), this.slotGroups.set(e, t);
 		}
 	}
@@ -244,7 +244,7 @@ var b = class extends o {
 					try {
 						await this.renderRevision(e), this.completedRevision = e, this.resolveWaiters(e);
 					} catch (t) {
-						let n = new d(e, t);
+						let n = new f(e, t);
 						this.completedRevision = e, this.rejectWaiters(e, n);
 					}
 				}
@@ -256,9 +256,9 @@ var b = class extends o {
 		}
 	}
 	async renderRevision(e) {
-		let t = i(this.documentValue), n = a(t);
-		_(n), this.applyRarityTitlePreset(n), this.data = n, super.draw(), this.drawRarityMask(t), this.applyArtworkFit(t), this.drawPendulumSplitMask(t), this.drawNameBlock(t), this.drawTitleShadow(t), this.drawForeground(t), this.applyForegroundTitlePolicy(t), this.applyForegroundOverlayPolicy(t), this.drawEffectBox(t), this.drawMark25th(t);
-		let r = v(t);
+		let t = a(this.documentValue), n = o(t);
+		v(n), this.applyRarityTitlePreset(n), this.data = n, super.draw(), this.drawRarityMask(t), this.applyArtworkFit(t), this.drawPendulumSplitMask(t), this.drawNameBlock(t), this.drawTitleShadow(t), this.drawForeground(t), this.applyForegroundTitlePolicy(t), this.applyForegroundOverlayPolicy(t), this.drawEffectBox(t), this.drawMark25th(t);
+		let r = y(t);
 		for (let { extension: t, group: n } of this.extensions.values()) {
 			let i = t.update({
 				group: n,
@@ -268,12 +268,12 @@ var b = class extends o {
 					this.scheduleRender();
 				}
 			});
-			if (y(i) && await i, e !== this.revisionValue) return;
+			if (b(i) && await i, e !== this.revisionValue) return;
 		}
 	}
 	applyRarityTitlePreset(e) {
 		if (!e.useRarityPreset || e.color || e.gradient) return;
-		let t = p[e.rare.trim().toLowerCase()];
+		let t = m[e.rare.trim().toLowerCase()];
 		t && Object.assign(e, t);
 	}
 	applyArtworkFit(e) {
@@ -293,55 +293,55 @@ var b = class extends o {
 	}
 	drawRarityMask(e) {
 		if (!this.leafer) return;
-		let t = this, n = t.rareLeaf;
-		if (!n) return;
-		let r = e.rarityMask, i = !!r.source && r.width > 0 && r.height > 0 && r.scale > 0, a = !!e.footer.rare && (i || r.maskEffectBox || r.maskArtwork), o = e.footer.rare === "o" ? 20.5 : 100, s = e.footer.rare === "pser2" ? "hard-light" : "pass-through";
-		if (!a) {
-			this.leafer.add(n), n.set({
-				blendMode: s,
-				zIndex: o
+		let n = this, r = n.rareLeaf;
+		if (!r) return;
+		let i = e.rarityMask, a = !!i.source && i.width > 0 && i.height > 0 && i.scale > 0, o = t(e.footer.rare, e.frame.type, e.footer.rarityEffect), s = o !== "none" && (a || i.maskEffectBox || i.maskArtwork), c = o === "pser2" ? "hard-light" : "pass-through";
+		if (!s) {
+			this.leafer.add(r), r.set({
+				blendMode: c,
+				zIndex: 100
 			}), this.rarityMaskLayer?.set({ visible: !1 });
 			return;
 		}
-		this.rarityMaskLayer || (this.rarityMaskLayer = new c(), this.rarityMaskShape = new c({ mask: "grayscale" }), this.rarityMaskBackground = new u({ fill: "#ffffff" }), this.rarityMaskLeaf = new l(), this.rarityArtworkMaskLeaf = new u({ fill: "#000000" }), this.rarityEffectBoxMaskLeaf = new u({ fill: "#000000" }), this.rarityMaskShape.add(this.rarityMaskBackground), this.rarityMaskShape.add(this.rarityMaskLeaf), this.rarityMaskShape.add(this.rarityArtworkMaskLeaf), this.rarityMaskShape.add(this.rarityEffectBoxMaskLeaf), this.rarityMaskLayer.add(this.rarityMaskShape), this.leafer.add(this.rarityMaskLayer)), this.rarityMaskLayer.add(n), this.rarityMaskLayer.set({
+		this.rarityMaskLayer || (this.rarityMaskLayer = new l(), this.rarityMaskShape = new l({ mask: "grayscale" }), this.rarityMaskBackground = new d({ fill: "#ffffff" }), this.rarityMaskLeaf = new u(), this.rarityArtworkMaskLeaf = new d({ fill: "#000000" }), this.rarityEffectBoxMaskLeaf = new d({ fill: "#000000" }), this.rarityMaskShape.add(this.rarityMaskBackground), this.rarityMaskShape.add(this.rarityMaskLeaf), this.rarityMaskShape.add(this.rarityArtworkMaskLeaf), this.rarityMaskShape.add(this.rarityEffectBoxMaskLeaf), this.rarityMaskLayer.add(this.rarityMaskShape), this.leafer.add(this.rarityMaskLayer)), this.rarityMaskLayer.add(r), this.rarityMaskLayer.set({
 			width: this.cardWidth,
 			height: this.cardHeight,
 			visible: !0,
-			zIndex: o,
-			blendMode: s
+			zIndex: 100,
+			blendMode: c
 		}), this.rarityMaskBackground?.set({
 			width: this.cardWidth,
 			height: this.cardHeight,
 			visible: !0
 		}), this.rarityMaskLeaf?.set({
-			url: r.source,
-			width: r.width,
-			height: r.height,
-			x: r.x,
-			y: r.y,
-			scaleX: r.scale,
-			scaleY: r.scale,
+			url: i.source,
+			width: i.width,
+			height: i.height,
+			x: i.x,
+			y: i.y,
+			scaleX: i.scale,
+			scaleY: i.scale,
 			around: {
 				type: "percent",
 				x: .5,
 				y: .5
 			},
-			visible: i
+			visible: a
 		}), this.rarityArtworkMaskLeaf?.set({
-			x: t.imageLeaf?.x ?? 0,
-			y: t.imageLeaf?.y ?? 0,
-			width: t.imageLeaf?.width ?? 0,
-			height: t.imageLeaf?.height ?? 0,
-			visible: r.maskArtwork
+			x: n.imageLeaf?.x ?? 0,
+			y: n.imageLeaf?.y ?? 0,
+			width: n.imageLeaf?.width ?? 0,
+			height: n.imageLeaf?.height ?? 0,
+			visible: i.maskArtwork
 		});
-		let d = e.effectBox, f = Math.min(16, d.width / 2), p = Math.min(16, d.height / 2), m = Math.min(20, d.height / 2);
+		let f = e.effectBox, p = Math.min(16, f.width / 2), m = Math.min(16, f.height / 2), h = Math.min(20, f.height / 2);
 		this.rarityEffectBoxMaskLeaf?.set({
-			x: d.x + f,
-			y: d.y + p,
-			width: Math.max(0, d.width - f * 2),
-			height: Math.max(0, d.height - p - m),
-			visible: r.maskEffectBox
-		}), n.set({
+			x: f.x + p,
+			y: f.y + m,
+			width: Math.max(0, f.width - p * 2),
+			height: Math.max(0, f.height - m - h),
+			visible: i.maskEffectBox
+		}), r.set({
 			blendMode: "pass-through",
 			zIndex: 0
 		});
@@ -350,8 +350,8 @@ var b = class extends o {
 		if (!this.leafer) return;
 		let t = this.maskLeaf;
 		if (t) {
-			if (this.pendulumEffectMaskLeaf || (this.pendulumEffectMaskLeaf = new l(), this.leafer.add(this.pendulumEffectMaskLeaf)), e.frame.type !== "pendulum") {
-				let e = h.normal;
+			if (this.pendulumEffectMaskLeaf || (this.pendulumEffectMaskLeaf = new u(), this.leafer.add(this.pendulumEffectMaskLeaf)), e.frame.type !== "pendulum") {
+				let e = g.normal;
 				t.set({
 					url: this.resourceUrl(e.url),
 					x: e.x,
@@ -364,19 +364,19 @@ var b = class extends o {
 				return;
 			}
 			t.set({
-				url: this.resourceUrl(h.pendulumArt.url),
-				x: h.pendulumArt.x,
-				y: h.pendulumArt.y,
-				width: h.pendulumArt.width,
-				height: h.pendulumArt.height,
+				url: this.resourceUrl(g.pendulumArt.url),
+				x: g.pendulumArt.x,
+				y: g.pendulumArt.y,
+				width: g.pendulumArt.width,
+				height: g.pendulumArt.height,
 				visible: !0,
 				zIndex: 20
 			}), this.pendulumEffectMaskLeaf.set({
-				url: this.resourceUrl(h.pendulumEffect.url),
-				x: h.pendulumEffect.x,
-				y: h.pendulumEffect.y,
-				width: h.pendulumEffect.width,
-				height: h.pendulumEffect.height,
+				url: this.resourceUrl(g.pendulumEffect.url),
+				x: g.pendulumEffect.x,
+				y: g.pendulumEffect.y,
+				width: g.pendulumEffect.width,
+				height: g.pendulumEffect.height,
 				visible: !0,
 				zIndex: 22
 			});
@@ -419,8 +419,8 @@ var b = class extends o {
 	}
 	drawNameBlock(e) {
 		if (!this.leafer) return;
-		this.nameBlockLeaf || (this.nameBlockLeaf = new l(), this.leafer.add(this.nameBlockLeaf));
-		let t = m.nameBlock;
+		this.nameBlockLeaf || (this.nameBlockLeaf = new u(), this.leafer.add(this.nameBlockLeaf));
+		let t = h.nameBlock;
 		this.nameBlockLeaf.set({
 			url: this.resourceUrl(t.url),
 			x: t.x,
@@ -433,7 +433,7 @@ var b = class extends o {
 	}
 	drawForeground(e) {
 		if (!this.leafer) return;
-		this.foregroundClipBox || (this.foregroundClipBox = new s(), this.leafer.add(this.foregroundClipBox)), this.foregroundLeaf || (this.foregroundLeaf = new l(), this.foregroundClipBox.add(this.foregroundLeaf));
+		this.foregroundClipBox || (this.foregroundClipBox = new c(), this.leafer.add(this.foregroundClipBox)), this.foregroundLeaf || (this.foregroundLeaf = new u(), this.foregroundClipBox.add(this.foregroundLeaf));
 		let t = e.foreground, n = this.foregroundVisible(e);
 		this.foregroundClipBox.set({
 			width: this.cardWidth,
@@ -460,19 +460,19 @@ var b = class extends o {
 		});
 	}
 	applyForegroundTitlePolicy(e) {
-		let t = this, n = e.footer.rare === "pser2" && !e.rarityMask.coverName;
-		this.titleShadowLeaf?.set({ zIndex: n ? 101 : 22 }), t.nameLeaf?.set({ zIndex: n ? 102 : 23 });
+		let n = this, r = t(e.footer.rare, e.frame.type, e.footer.rarityEffect) === "pser2" && !e.rarityMask.coverName;
+		this.titleShadowLeaf?.set({ zIndex: r ? 101 : 22 }), n.nameLeaf?.set({ zIndex: r ? 102 : 23 });
 	}
 	applyForegroundOverlayPolicy(e) {
-		let t = this, n = e.footer.rare === "pser2", r = n && !e.rarityMask.coverLevel ? 101 : e.foreground.coverLevel ? 10 : 22;
-		t.levelLeaf?.set({ zIndex: r }), t.rankLeaf?.set({ zIndex: r }), t.attributeLeaf?.set({ zIndex: n && !e.rarityMask.coverAttribute ? 101 : e.foreground.coverAttribute ? 10 : 22 });
-		let i = this.foregroundVisible(e), a = n ? e.rarityMask.coverLevel ? i && e.foreground.coverLevel ? 20.5 : 22 : 101 : i ? e.foreground.coverLevel ? 20.5 : 22 : 120;
-		t.linkArrowLeaf?.set({ zIndex: a });
+		let n = this, r = t(e.footer.rare, e.frame.type, e.footer.rarityEffect) === "pser2", i = r && !e.rarityMask.coverLevel ? 101 : e.foreground.coverLevel ? 10 : 22;
+		n.levelLeaf?.set({ zIndex: i }), n.rankLeaf?.set({ zIndex: i }), n.attributeLeaf?.set({ zIndex: r && !e.rarityMask.coverAttribute ? 101 : e.foreground.coverAttribute ? 10 : 22 });
+		let a = this.foregroundVisible(e), o = r ? e.rarityMask.coverLevel ? a && e.foreground.coverLevel ? 20.5 : 22 : 101 : a ? e.foreground.coverLevel ? 20.5 : 22 : 120;
+		n.linkArrowLeaf?.set({ zIndex: o });
 	}
 	drawEffectBox(e) {
 		if (!this.leafer) return;
 		let t = this;
-		this.effectBoxFillLeaf || (this.effectBoxFillLeaf = new u(), this.leafer.add(this.effectBoxFillLeaf)), this.effectBoxBorderLeaf || (this.effectBoxBorderLeaf = new l(), this.leafer.add(this.effectBoxBorderLeaf));
+		this.effectBoxFillLeaf || (this.effectBoxFillLeaf = new d(), this.leafer.add(this.effectBoxFillLeaf)), this.effectBoxBorderLeaf || (this.effectBoxBorderLeaf = new u(), this.leafer.add(this.effectBoxBorderLeaf));
 		let n = e.effectBox, r = n.enabled && n.width > 0 && n.height > 0 && n.opacity > 0, i = n.borderStyle !== "none" && n.width > 0 && n.height > 0, a = Math.min(16, n.width / 2), o = Math.min(16, n.height / 2), s = Math.min(20, n.height / 2);
 		this.effectBoxFillLeaf.set({
 			x: n.x + a,
@@ -484,7 +484,7 @@ var b = class extends o {
 			visible: r,
 			zIndex: 28
 		});
-		let c = (e.frame.effectBorderStyle === "auto" ? n.borderStyle === "colored" : e.frame.effectBorderStyle === "color") ? m.effectBox.coloredUrl : m.effectBox.defaultUrl;
+		let c = (e.frame.effectBorderStyle === "auto" ? n.borderStyle === "colored" : e.frame.effectBorderStyle === "color") ? h.effectBox.coloredUrl : h.effectBox.defaultUrl;
 		this.effectBoxBorderLeaf.set({
 			url: this.resourceUrl(c),
 			x: n.x,
@@ -502,8 +502,8 @@ var b = class extends o {
 	}
 	drawMark25th(e) {
 		if (!this.leafer) return;
-		this.mark25thLeaf || (this.mark25thLeaf = new l(), this.leafer.add(this.mark25thLeaf));
-		let t = m.mark25th;
+		this.mark25thLeaf || (this.mark25thLeaf = new u(), this.leafer.add(this.mark25thLeaf));
+		let t = h.mark25th;
 		this.mark25thLeaf.set({
 			url: this.resourceUrl(t.url),
 			x: t.x,
@@ -526,4 +526,4 @@ var b = class extends o {
 	}
 };
 //#endregion
-export { b as YugiohCard, d as YugiohCardRenderError };
+export { x as YugiohCard, f as YugiohCardRenderError };

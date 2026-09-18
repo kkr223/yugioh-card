@@ -5,7 +5,23 @@ var e = [
 	"silver",
 	"gold",
 	"color"
-], t = {
+], t = [
+	"auto",
+	"none",
+	"dt",
+	"ur",
+	"ur-pendulum",
+	"hr",
+	"ser",
+	"ser-pendulum",
+	"pser2"
+];
+function n(e, n, i = "auto") {
+	if (i !== "auto" && t.includes(i)) return i;
+	let a = r[e.trim().toLowerCase()] ?? {};
+	return a.effect ? `${a.effect}${n === "pendulum" && a.pendulumEffect ? "-pendulum" : ""}` : "none";
+}
+var r = {
 	dt: { effect: "dt" },
 	ur: {
 		effect: "ur",
@@ -51,13 +67,14 @@ var e = [
 	},
 	o: { cardBorder: "color" }
 };
-function n(e, n = "monster") {
-	let r = t[e.trim().toLowerCase()] ?? {}, i = n === "pendulum", a = (e) => e === "sliver" ? "silver" : e ?? "default";
+function i(e, t = "monster") {
+	let i = r[e.trim().toLowerCase()] ?? {}, a = t === "pendulum", o = (e) => e === "sliver" ? "silver" : e ?? "default";
 	return {
-		cardBorderStyle: a(r.cardBorder),
-		artBorderStyle: a(i ? r.pendulumFrame : r.artBorder),
-		effectBorderStyle: a(i ? r.pendulumFrame : r.effectBorder)
+		cardBorderStyle: o(i.cardBorder),
+		artBorderStyle: o(a ? i.pendulumFrame : i.artBorder),
+		effectBorderStyle: o(a ? i.pendulumFrame : i.effectBorder),
+		rarityEffect: n(e, t)
 	};
 }
 //#endregion
-export { t as RARITY_LAYER_PRESETS, e as YUGIOH_FRAME_STYLES, n as getRarityFramePreset };
+export { e as YUGIOH_FRAME_STYLES, t as YUGIOH_RARITY_EFFECTS, i as getRarityFramePreset, n as resolveRarityEffect };

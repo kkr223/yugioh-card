@@ -1,7 +1,7 @@
 import { numberToFull as e } from "../utils/index.js";
 import { Card as t } from "../card/index.js";
 import { CompressText as n } from "../compress-text/compress-text.js";
-import { RARITY_LAYER_PRESETS as r, getRarityFramePreset as i } from "./rarity.js";
+import { getRarityFramePreset as r, resolveRarityEffect as i } from "./rarity.js";
 import a from "./style/sc-style.js";
 import o from "./style/tc-style.js";
 import s from "./style/jp-style.js";
@@ -593,21 +593,21 @@ var _ = {
 	}
 	drawRare() {
 		this.rareLeaf || (this.rareLeaf = new m(), this.leafer.add(this.rareLeaf)), this.rareCardBorderLeaf || (this.rareCardBorderLeaf = new m(), this.leafer.add(this.rareCardBorderLeaf)), this.rareArtBorderLeaf || (this.rareArtBorderLeaf = new m(), this.leafer.add(this.rareArtBorderLeaf)), this.rarePendulumArtBorderLeaf || (this.rarePendulumArtBorderLeaf = new m(), this.leafer.add(this.rarePendulumArtBorderLeaf)), this.rarePendulumEffectBorderLeaf || (this.rarePendulumEffectBorderLeaf = new m(), this.leafer.add(this.rarePendulumEffectBorderLeaf)), this.rareEffectBorderLeaf || (this.rareEffectBorderLeaf = new m(), this.leafer.add(this.rareEffectBorderLeaf));
-		let e = r[this.data.rare.trim().toLowerCase()] || {}, t = i(this.data.rare, this.data.type);
+		let e = i(this.data.rare, this.data.type, this.data.rarityEffect), t = r(this.data.rare, this.data.type);
 		for (let e of [
 			"cardBorderStyle",
 			"artBorderStyle",
 			"effectBorderStyle"
 		]) this.data[e] && this.data[e] !== "auto" && (t[e] = this.data[e]);
-		let n = t.cardBorderStyle === "default" ? "" : t.cardBorderStyle, a = t.artBorderStyle === "default" ? "" : t.artBorderStyle, o = (e) => e === "silver" ? "sliver" : e === "color" ? "gold" : e, s = a ? o(a) : "", c = t.effectBorderStyle === "default" ? "" : o(t.effectBorderStyle), l = t.effectBorderStyle === "color" ? "color" : "", u = this.data.type === "pendulum", d = u && e.pendulumEffect ? "-pendulum" : "", f = e.effect ? `${this.baseImage}/rare-effect/rare-${e.effect}${d}.png` : "", p = u && e.effect === "hr", h = v.width / _.width, g = v.height / _.height;
+		let n = t.cardBorderStyle === "default" ? "" : t.cardBorderStyle, a = t.artBorderStyle === "default" ? "" : t.artBorderStyle, o = (e) => e === "silver" ? "sliver" : e === "color" ? "gold" : e, s = a ? o(a) : "", c = t.effectBorderStyle === "default" ? "" : o(t.effectBorderStyle), l = t.effectBorderStyle === "color" ? "color" : "", u = this.data.type === "pendulum", d = e === "none" ? "" : `${this.baseImage}/rare-effect/rare-${e}.png`, f = u && e === "hr", p = v.width / _.width, h = v.height / _.height;
 		this.rareLeaf.set({
-			url: f,
-			x: p ? v.x - _.x * h : 0,
-			y: p ? v.y - _.y * g : 0,
-			width: p ? this.cardWidth * h : this.cardWidth,
-			height: p ? this.cardHeight * g : this.cardHeight,
+			url: d,
+			x: f ? v.x - _.x * p : 0,
+			y: f ? v.y - _.y * h : 0,
+			width: f ? this.cardWidth * p : this.cardWidth,
+			height: f ? this.cardHeight * h : this.cardHeight,
 			cornerRadius: this.data.radius ? 24 : 0,
-			visible: !!e.effect,
+			visible: e !== "none",
 			zIndex: 100
 		}), this.rareCardBorderLeaf.set({
 			url: n ? `${this.baseImage}/card-border/card-border-${n}.png` : "",
@@ -691,10 +691,9 @@ var _ = {
 		return this.showAttribute && [
 			"hr",
 			"ser",
-			"gser",
-			"pser",
+			"ser-pendulum",
 			"pser2"
-		].includes(this.data.rare);
+		].includes(i(this.data.rare, this.data.type, this.data.rarityEffect));
 	}
 	get showLevel() {
 		let e = !1;
