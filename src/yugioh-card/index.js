@@ -60,18 +60,18 @@ var d = class extends Error {
 	}
 }, m = {
 	nameBlock: {
-		url: "/yugioh/image/name-block.png",
+		url: "/yugioh/image/other/name-block.png",
 		x: 76,
 		y: 82,
 		width: 1242,
 		height: 157
 	},
 	effectBox: {
-		defaultUrl: "/yugioh/image/eblock-border.png",
-		coloredUrl: "/yugioh/image/eblock-border-o.png"
+		defaultUrl: "/yugioh/image/effect-border/eblock-border.png",
+		coloredUrl: "/yugioh/image/effect-border/eblock-border-color.png"
 	},
 	mark25th: {
-		url: "/yugioh/image/mark25th.png",
+		url: "/yugioh/image/watermark/mark25th.png",
 		x: 503,
 		y: 1496,
 		width: 388,
@@ -79,28 +79,21 @@ var d = class extends Error {
 	}
 }, h = {
 	normal: {
-		url: "/yugioh/image/card-mask.png",
+		url: "/yugioh/image/art-border/art-frame-base.png",
 		x: 117,
 		y: 322,
 		width: 1162,
 		height: 1162
 	},
-	pendulum: {
-		url: "/yugioh/image/card-mask-pendulum.png",
-		x: 68,
-		y: 342,
-		width: 1257,
-		height: 1595
-	},
 	pendulumArt: {
-		url: "/yugioh/image/card-mask-pendulum-art.png",
+		url: "/yugioh/image/pendulum-frame/pframe-art-base.png",
 		x: 68,
 		y: 342,
 		width: 1257,
 		height: 914
 	},
 	pendulumEffect: {
-		url: "/yugioh/image/card-mask-pendulum-effect.png",
+		url: "/yugioh/image/pendulum-frame/pframe-effect-base.png",
 		x: 68,
 		y: 1256,
 		width: 1257,
@@ -356,14 +349,14 @@ var b = class extends o {
 		if (!this.leafer) return;
 		let t = this.maskLeaf;
 		if (t) {
-			if (this.pendulumEffectMaskLeaf || (this.pendulumEffectMaskLeaf = new l(), this.leafer.add(this.pendulumEffectMaskLeaf)), !(e.frame.type === "pendulum" && this.foregroundVisible(e))) {
-				let n = e.frame.type === "pendulum" ? h.pendulum : h.normal;
+			if (this.pendulumEffectMaskLeaf || (this.pendulumEffectMaskLeaf = new l(), this.leafer.add(this.pendulumEffectMaskLeaf)), e.frame.type !== "pendulum") {
+				let e = h.normal;
 				t.set({
-					url: this.resourceUrl(n.url),
-					x: n.x,
-					y: n.y,
-					width: n.width,
-					height: n.height,
+					url: this.resourceUrl(e.url),
+					x: e.x,
+					y: e.y,
+					width: e.width,
+					height: e.height,
 					visible: !0,
 					zIndex: 20
 				}), this.pendulumEffectMaskLeaf.set({ visible: !1 });
@@ -477,27 +470,33 @@ var b = class extends o {
 	}
 	drawEffectBox(e) {
 		if (!this.leafer) return;
+		let t = this;
 		this.effectBoxFillLeaf || (this.effectBoxFillLeaf = new u(), this.leafer.add(this.effectBoxFillLeaf)), this.effectBoxBorderLeaf || (this.effectBoxBorderLeaf = new l(), this.leafer.add(this.effectBoxBorderLeaf));
-		let t = e.effectBox, n = t.enabled && t.width > 0 && t.height > 0 && t.opacity > 0, r = t.borderStyle !== "none" && t.width > 0 && t.height > 0, i = Math.min(16, t.width / 2), a = Math.min(16, t.height / 2), o = Math.min(20, t.height / 2);
+		let n = e.effectBox, r = n.enabled && n.width > 0 && n.height > 0 && n.opacity > 0, i = n.borderStyle !== "none" && n.width > 0 && n.height > 0, a = Math.min(16, n.width / 2), o = Math.min(16, n.height / 2), s = Math.min(20, n.height / 2);
 		this.effectBoxFillLeaf.set({
-			x: t.x + i,
-			y: t.y + a,
-			width: Math.max(0, t.width - i * 2),
-			height: Math.max(0, t.height - a - o),
-			fill: t.color,
-			opacity: t.opacity,
-			visible: n,
+			x: n.x + a,
+			y: n.y + o,
+			width: Math.max(0, n.width - a * 2),
+			height: Math.max(0, n.height - o - s),
+			fill: n.color,
+			opacity: n.opacity,
+			visible: r,
 			zIndex: 28
 		});
-		let s = t.borderStyle === "colored" ? m.effectBox.coloredUrl : m.effectBox.defaultUrl;
+		let c = n.borderStyle === "colored" ? m.effectBox.coloredUrl : m.effectBox.defaultUrl;
 		this.effectBoxBorderLeaf.set({
-			url: this.resourceUrl(s),
-			x: t.x,
-			y: t.y,
-			width: t.width,
-			height: t.height,
-			visible: r,
+			url: this.resourceUrl(c),
+			x: n.x,
+			y: n.y,
+			width: n.width,
+			height: n.height,
+			visible: i,
 			zIndex: 29
+		}), t.rareEffectBorderLeaf?.set({
+			x: n.x,
+			y: n.y,
+			width: n.width,
+			height: n.height
 		});
 	}
 	drawMark25th(e) {

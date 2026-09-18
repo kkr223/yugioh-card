@@ -20,7 +20,11 @@ export class LegacyYugiohCardRenderer extends Card<Record<string, unknown>> {
     copyrightLeaf: null;
     laserLeaf: null;
     rareLeaf: null;
-    rarePrintLeaf: null;
+    rareCardBorderLeaf: null;
+    rareArtBorderLeaf: null;
+    rarePendulumArtBorderLeaf: null;
+    rarePendulumEffectBorderLeaf: null;
+    rareEffectBorderLeaf: null;
     attributeRareLeaf: null;
     twentiethLeaf: null;
     data: {

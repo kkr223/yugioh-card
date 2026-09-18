@@ -11,7 +11,62 @@ import l from "./style/custom1-style.js";
 import u from "./style/custom2-style.js";
 import { Group as d, Image as f, Rect as p, Text as m } from "leafer-unified";
 //#region packages/src/yugioh-card/legacy-renderer.js
-var h = class extends t {
+var h = {
+	dt: { effect: "dt" },
+	ur: {
+		effect: "ur",
+		pendulumEffect: !0
+	},
+	gr: {
+		cardBorder: "gold",
+		artBorder: "gold",
+		pendulumFrame: "gold"
+	},
+	hr: {
+		effect: "hr",
+		cardBorder: "silver",
+		artBorder: "silver",
+		pendulumFrame: "sliver",
+		effectBorder: "color"
+	},
+	ser: {
+		effect: "ser",
+		pendulumEffect: !0
+	},
+	gser: {
+		effect: "ser",
+		pendulumEffect: !0,
+		cardBorder: "color",
+		artBorder: "color",
+		pendulumFrame: "gold",
+		effectBorder: "color"
+	},
+	pser: {
+		effect: "ser",
+		pendulumEffect: !0,
+		cardBorder: "silver",
+		artBorder: "silver",
+		pendulumFrame: "sliver",
+		effectBorder: "color"
+	},
+	pser2: {
+		effect: "pser2",
+		cardBorder: "silver",
+		artBorder: "silver",
+		pendulumFrame: "sliver"
+	},
+	o: { cardBorder: "color" }
+}, g = {
+	x: 170,
+	y: 375,
+	width: 1054,
+	height: 1054
+}, _ = {
+	x: 94,
+	y: 364,
+	width: 1205,
+	height: 900
+}, v = class extends t {
 	cardLeaf = null;
 	nameLeaf = null;
 	attributeLeaf = null;
@@ -31,7 +86,11 @@ var h = class extends t {
 	copyrightLeaf = null;
 	laserLeaf = null;
 	rareLeaf = null;
-	rarePrintLeaf = null;
+	rareCardBorderLeaf = null;
+	rareArtBorderLeaf = null;
+	rarePendulumArtBorderLeaf = null;
+	rarePendulumEffectBorderLeaf = null;
+	rareEffectBorderLeaf = null;
 	attributeRareLeaf = null;
 	twentiethLeaf = null;
 	cardWidth = 1394;
@@ -132,7 +191,7 @@ var h = class extends t {
 			}
 			this.leafer.add(this.levelLeaf);
 		}
-		let e = `${this.baseImage}/level.png`, t = this.data.level < 13 ? 147 : 101;
+		let e = `${this.baseImage}/level/level.png`, t = this.data.level < 13 ? 147 : 101;
 		this.levelLeaf.children.forEach((n, r) => {
 			n.set({
 				url: e,
@@ -159,7 +218,7 @@ var h = class extends t {
 			}
 			this.leafer.add(this.rankLeaf);
 		}
-		let e = `${this.baseImage}/rank.png`, t = this.data.rank < 13 ? 147 : 101;
+		let e = `${this.baseImage}/level/rank.png`, t = this.data.rank < 13 ? 147 : 101;
 		this.rankLeaf.children.forEach((n, r) => {
 			n.set({
 				url: e,
@@ -178,7 +237,7 @@ var h = class extends t {
 			let e = new n(), t = new f(), r = new n();
 			this.spellTrapLeaf.add(e), this.spellTrapLeaf.add(t), this.spellTrapLeaf.add(r), this.leafer.add(this.spellTrapLeaf);
 		}
-		let { spellTrap: e } = this.style, { icon: t } = e, r = this.data.icon ? `${this.baseImage}/icon-${this.data.icon}.png` : "", i = this.data.icon ? 72 : 0, a = ["en", "kr"].includes(this.data.language) ? "[" : "【", o = ["en", "kr"].includes(this.data.language) ? "]" : "】", s = e.letterSpacing || 0, c = e.wordSpacing || 0, l = this.spellTrapLeaf.children[0], u = this.spellTrapLeaf.children[1], p = this.spellTrapLeaf.children[2];
+		let { spellTrap: e } = this.style, { icon: t } = e, r = this.data.icon ? `${this.baseImage}/icon/icon-${this.data.icon}.png` : "", i = this.data.icon ? 72 : 0, a = ["en", "kr"].includes(this.data.language) ? "[" : "【", o = ["en", "kr"].includes(this.data.language) ? "]" : "】", s = e.letterSpacing || 0, c = e.wordSpacing || 0, l = this.spellTrapLeaf.children[0], u = this.spellTrapLeaf.children[1], p = this.spellTrapLeaf.children[2];
 		l.set({
 			text: o,
 			fontFamily: e.fontFamily,
@@ -229,7 +288,7 @@ var h = class extends t {
 	}
 	drawMask() {
 		this.maskLeaf || (this.maskLeaf = new f(), this.leafer.add(this.maskLeaf));
-		let e = this.data.type === "pendulum" ? `${this.baseImage}/card-mask-pendulum.png` : `${this.baseImage}/card-mask.png`;
+		let e = this.data.type === "pendulum" ? `${this.baseImage}/pendulum-frame/pframe-art-base.png` : `${this.baseImage}/art-border/art-frame-base.png`;
 		this.maskLeaf.set({
 			url: e,
 			x: this.data.type === "pendulum" ? 68 : 117,
@@ -326,83 +385,83 @@ var h = class extends t {
 			{
 				x: 555,
 				y: 278,
-				url: this.baseImage + "/arrow-up-on.png"
+				url: this.baseImage + "/linkmarker/arrow-up-on.png"
 			},
 			{
 				x: 1130,
 				y: 299,
-				url: this.baseImage + "/arrow-right-up-on.png"
+				url: this.baseImage + "/linkmarker/arrow-right-up-on.png"
 			},
 			{
 				x: 1223,
 				y: 761,
-				url: this.baseImage + "/arrow-right-on.png"
+				url: this.baseImage + "/linkmarker/arrow-right-on.png"
 			},
 			{
 				x: 1130,
 				y: 1336,
-				url: this.baseImage + "/arrow-right-down-on.png"
+				url: this.baseImage + "/linkmarker/arrow-right-down-on.png"
 			},
 			{
 				x: 555,
 				y: 1428,
-				url: this.baseImage + "/arrow-down-on.png"
+				url: this.baseImage + "/linkmarker/arrow-down-on.png"
 			},
 			{
 				x: 95,
 				y: 1336,
-				url: this.baseImage + "/arrow-left-down-on.png"
+				url: this.baseImage + "/linkmarker/arrow-left-down-on.png"
 			},
 			{
 				x: 71,
 				y: 758,
-				url: this.baseImage + "/arrow-left-on.png"
+				url: this.baseImage + "/linkmarker/arrow-left-on.png"
 			},
 			{
 				x: 95,
 				y: 299,
-				url: this.baseImage + "/arrow-left-up-on.png"
+				url: this.baseImage + "/linkmarker/arrow-left-up-on.png"
 			}
 		], t = [
 			{
 				x: 555,
 				y: 278,
-				url: this.baseImage + "/arrow-up-off.png"
+				url: this.baseImage + "/linkmarker/arrow-up-off.png"
 			},
 			{
 				x: 1130,
 				y: 299,
-				url: this.baseImage + "/arrow-right-up-off.png"
+				url: this.baseImage + "/linkmarker/arrow-right-up-off.png"
 			},
 			{
 				x: 1223,
 				y: 761,
-				url: this.baseImage + "/arrow-right-off.png"
+				url: this.baseImage + "/linkmarker/arrow-right-off.png"
 			},
 			{
 				x: 1130,
 				y: 1336,
-				url: this.baseImage + "/arrow-right-down-off.png"
+				url: this.baseImage + "/linkmarker/arrow-right-down-off.png"
 			},
 			{
 				x: 555,
 				y: 1428,
-				url: this.baseImage + "/arrow-down-off.png"
+				url: this.baseImage + "/linkmarker/arrow-down-off.png"
 			},
 			{
 				x: 95,
 				y: 1336,
-				url: this.baseImage + "/arrow-left-down-off.png"
+				url: this.baseImage + "/linkmarker/arrow-left-down-off.png"
 			},
 			{
 				x: 71,
 				y: 758,
-				url: this.baseImage + "/arrow-left-off.png"
+				url: this.baseImage + "/linkmarker/arrow-left-off.png"
 			},
 			{
 				x: 95,
 				y: 299,
-				url: this.baseImage + "/arrow-left-up-off.png"
+				url: this.baseImage + "/linkmarker/arrow-left-up-off.png"
 			}
 		];
 		this.linkArrowLeaf.children.forEach((n, r) => {
@@ -551,7 +610,7 @@ var h = class extends t {
 	}
 	drawCopyright() {
 		this.copyrightLeaf || (this.copyrightLeaf = new f(), this.leafer.add(this.copyrightLeaf));
-		let e = this.data.type === "monster" && this.data.cardType === "xyz" ? "white" : "black", t = this.data.copyright ? `${this.baseImage}/copyright-${this.data.copyright}-${e}.svg` : "";
+		let e = this.data.type === "monster" && this.data.cardType === "xyz" ? "white" : "black", t = this.data.copyright ? `${this.baseImage}/copyright/copyright-${this.data.copyright}-${e}.svg` : "";
 		this.copyrightLeaf.set({
 			url: t,
 			x: this.cardWidth - 141,
@@ -567,7 +626,7 @@ var h = class extends t {
 	}
 	drawLaser() {
 		this.laserLeaf || (this.laserLeaf = new f(), this.leafer.add(this.laserLeaf));
-		let e = this.data.laser ? `${this.baseImage}/${this.data.laser}.png` : "";
+		let e = this.data.laser ? `${this.baseImage}/fp-mark/${this.data.laser}.png` : "";
 		this.laserLeaf.set({
 			url: e,
 			x: 1276,
@@ -577,23 +636,51 @@ var h = class extends t {
 		});
 	}
 	drawRare() {
-		this.rareLeaf || (this.rareLeaf = new f(), this.leafer.add(this.rareLeaf)), this.rarePrintLeaf || (this.rarePrintLeaf = new f(), this.leafer.add(this.rarePrintLeaf));
-		let e = this.data.type === "pendulum" && this.data.rare !== "pser2" ? "-pendulum" : "", t = this.data.type === "pendulum" ? "-pendulum" : "", n = this.data.rare === "o" ? `${this.baseImage}/card-bleed-rainbow.png` : this.data.rare ? `${this.baseImage}/rare-${this.data.rare}${e}.png` : "";
+		this.rareLeaf || (this.rareLeaf = new f(), this.leafer.add(this.rareLeaf)), this.rareCardBorderLeaf || (this.rareCardBorderLeaf = new f(), this.leafer.add(this.rareCardBorderLeaf)), this.rareArtBorderLeaf || (this.rareArtBorderLeaf = new f(), this.leafer.add(this.rareArtBorderLeaf)), this.rarePendulumArtBorderLeaf || (this.rarePendulumArtBorderLeaf = new f(), this.leafer.add(this.rarePendulumArtBorderLeaf)), this.rarePendulumEffectBorderLeaf || (this.rarePendulumEffectBorderLeaf = new f(), this.leafer.add(this.rarePendulumEffectBorderLeaf)), this.rareEffectBorderLeaf || (this.rareEffectBorderLeaf = new f(), this.leafer.add(this.rareEffectBorderLeaf));
+		let e = h[this.data.rare.trim().toLowerCase()] || {}, t = this.data.type === "pendulum", n = t && e.pendulumEffect ? "-pendulum" : "", r = e.effect ? `${this.baseImage}/rare-effect/rare-${e.effect}${n}.png` : "", i = t && e.effect === "hr", a = _.width / g.width, o = _.height / g.height;
 		this.rareLeaf.set({
-			url: n,
+			url: r,
+			x: i ? _.x - g.x * a : 0,
+			y: i ? _.y - g.y * o : 0,
+			width: i ? this.cardWidth * a : this.cardWidth,
+			height: i ? this.cardHeight * o : this.cardHeight,
 			cornerRadius: this.data.radius ? 24 : 0,
-			visible: this.data.rare,
-			zIndex: this.data.rare === "o" ? 20.5 : 100
-		}), this.rarePrintLeaf.set({
-			url: this.data.rare === "pser2" ? `${this.baseImage}/rare-pser-print${t}.png` : "",
+			visible: !!e.effect,
+			zIndex: 100
+		}), this.rareCardBorderLeaf.set({
+			url: e.cardBorder ? `${this.baseImage}/card-border/card-border-${e.cardBorder}.png` : "",
 			cornerRadius: this.data.radius ? 24 : 0,
-			visible: this.data.rare === "pser2",
+			visible: !!e.cardBorder,
 			zIndex: 20.5
+		}), this.rareArtBorderLeaf.set({
+			url: e.artBorder ? `${this.baseImage}/art-border/art-frame-${e.artBorder}.png` : "",
+			x: 117,
+			y: 322,
+			visible: !!e.artBorder && !t,
+			zIndex: 20.5
+		}), this.rarePendulumArtBorderLeaf.set({
+			url: e.pendulumFrame ? `${this.baseImage}/pendulum-frame/pframe-art-${e.pendulumFrame}.png` : "",
+			x: 68,
+			y: 342,
+			visible: !!e.pendulumFrame && t,
+			zIndex: 20.5
+		}), this.rarePendulumEffectBorderLeaf.set({
+			url: e.pendulumFrame ? `${this.baseImage}/pendulum-frame/pframe-effect-${e.pendulumFrame}.png` : "",
+			x: 68,
+			y: 1256,
+			visible: !!e.pendulumFrame && t,
+			zIndex: 22
+		}), this.rareEffectBorderLeaf.set({
+			url: e.effectBorder ? `${this.baseImage}/effect-border/eblock-border-${e.effectBorder}.png` : "",
+			x: 77,
+			y: 1501,
+			visible: !!e.effectBorder && !t,
+			zIndex: 29
 		});
 	}
 	drawAttributeRare() {
 		this.attributeRareLeaf || (this.attributeRareLeaf = new f(), this.leafer.add(this.attributeRareLeaf));
-		let e = `${this.baseImage}/attribute-rare.png`;
+		let e = `${this.baseImage}/attribute/attribute-rare.png`;
 		this.attributeRareLeaf.set({
 			url: e,
 			x: 1163,
@@ -604,7 +691,7 @@ var h = class extends t {
 	}
 	drawTwentieth() {
 		this.twentiethLeaf || (this.twentiethLeaf = new f(), this.leafer.add(this.twentiethLeaf));
-		let e = `${this.baseImage}/twentieth.png`;
+		let e = `${this.baseImage}/watermark/twentieth.png`;
 		this.twentiethLeaf.set({
 			url: e,
 			x: 472,
@@ -621,7 +708,7 @@ var h = class extends t {
 		return this.data.font ? this.data.font === "custom1" ? e = l : this.data.font === "custom2" && (e = u) : this.data.language === "sc" ? e = r : this.data.language === "tc" ? e = i : this.data.language === "jp" ? e = a : this.data.language === "kr" ? e = o : this.data.language === "en" ? e = s : (this.data.language === "astral" || this.data.language === "astral") && (e = c), e;
 	}
 	get cardUrl() {
-		return this.data.type === "monster" ? `${this.baseImage}/card-${this.data.cardType}.png` : this.data.type === "pendulum" ? `${this.baseImage}/card-${this.data.pendulumType}.png` : `${this.baseImage}/card-${this.data.type}.png`;
+		return this.data.type === "monster" ? `${this.baseImage}/card/card-${this.data.cardType}.png` : this.data.type === "pendulum" ? `${this.baseImage}/card/card-${this.data.pendulumType}.png` : `${this.baseImage}/card/card-${this.data.type}.png`;
 	}
 	get autoNameColor() {
 		let e = "black";
@@ -632,7 +719,7 @@ var h = class extends t {
 	}
 	get attributeUrl() {
 		let e = "";
-		return this.data.language === "jp" ? e = "-jp" : this.data.language === "kr" ? e = "-kr" : this.data.language === "en" ? e = "-en" : this.data.language === "astral" && (e = "-astral"), ["monster", "pendulum"].includes(this.data.type) ? this.data.attribute ? `${this.baseImage}/attribute-${this.data.attribute}${e}.png` : "" : `${this.baseImage}/attribute-${this.data.type}${e}.png`;
+		return this.data.language === "jp" ? e = "-jp" : this.data.language === "kr" ? e = "-kr" : this.data.language === "en" ? e = "-en" : this.data.language === "astral" && (e = "-astral"), ["monster", "pendulum"].includes(this.data.type) ? this.data.attribute ? `${this.baseImage}/attribute/attribute-${this.data.attribute}${e}.png` : "" : `${this.baseImage}/attribute/attribute-${this.data.type}${e}.png`;
 	}
 	get spellTrapName() {
 		let e = "";
@@ -680,8 +767,8 @@ var h = class extends t {
 	}
 	get atkDefLinkUrl() {
 		let e = "";
-		return this.data.language === "astral" ? ((this.data.type === "monster" && this.data.cardType !== "link" || this.data.type === "pendulum") && (e = `${this.baseImage}/atk-def-astral.svg`), this.data.type === "monster" && this.data.cardType === "link" && (e = `${this.baseImage}/atk-link-astral.svg`)) : ((this.data.type === "monster" && this.data.cardType !== "link" || this.data.type === "pendulum") && (e = `${this.baseImage}/atk-def.svg`), this.data.type === "monster" && this.data.cardType === "link" && (e = `${this.baseImage}/atk-link.svg`)), e;
+		return this.data.language === "astral" ? ((this.data.type === "monster" && this.data.cardType !== "link" || this.data.type === "pendulum") && (e = `${this.baseImage}/text/atk-def-astral.svg`), this.data.type === "monster" && this.data.cardType === "link" && (e = `${this.baseImage}/text/atk-link-astral.svg`)) : ((this.data.type === "monster" && this.data.cardType !== "link" || this.data.type === "pendulum") && (e = `${this.baseImage}/text/atk-def.svg`), this.data.type === "monster" && this.data.cardType === "link" && (e = `${this.baseImage}/text/atk-link.svg`)), e;
 	}
 };
 //#endregion
-export { h as LegacyYugiohCardRenderer };
+export { v as LegacyYugiohCardRenderer };
