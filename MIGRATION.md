@@ -100,7 +100,7 @@ foreground. The old
 Rarity values are now presets that compose the separate card border, artwork or
 pendulum frame, effect-box border, and `rare-effect/` overlay resources.
 `cardBorderStyle`, `artBorderStyle`, and `effectBorderStyle` override those three
-frame parts independently (`auto`, `default`, `silver`, `gold`, or `color`).
+frame parts independently (`auto`, `default`, `silver`, `gold`, `color`, or `grandmaster`).
 They live under `frame` in structured documents. `auto` preserves legacy rarity
 behavior; `default` explicitly uses the base frame even when a rarity is selected.
 `getRarityFramePreset(rare, type)` from `yugioh-card-ts/document` returns explicit
@@ -109,8 +109,12 @@ It also returns `rarityEffect`: `none`, `dt`, `ur`, `ur-pendulum`, `hr`, `ser`,
 `ser-pendulum`, or `pser2`. Set this flat field (or `footer.rarityEffect` in a
 document) to change the effect independently. `auto` retains legacy preset
 selection. Masks, blending and effect coverage follow the selected effect.
-Ordinary effect frames support default/color; pendulum artwork and effect frames
-support default/silver/gold. A color choice carried over to pendulum uses gold;
+Ordinary effect frames support default/color/grandmaster; pendulum artwork and effect frames
+support default/silver/gold/color. The `o` preset uses the color artwork border,
+including `pframe-art-color` below the foreground and `pframe-effect-color` above it.
+The `grandmaster` (大师) preset uses grandmaster card and effect-box borders with
+the same color artwork frame as `o`, without an additional rarity effect.
+On pendulum cards its pendulum frame is color and its lower effect-box border is grandmaster;
 silver/gold effect choices carried over to an ordinary card use its default frame.
 Use `foregroundCoverLevel: false` when the foreground image should stay behind
 level, rank, and link-marker overlays. Use `foregroundCoverAttribute: false`

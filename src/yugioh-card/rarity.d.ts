@@ -1,4 +1,4 @@
-export declare const YUGIOH_FRAME_STYLES: readonly ["auto", "default", "silver", "gold", "color"];
+export declare const YUGIOH_FRAME_STYLES: readonly ["auto", "default", "silver", "gold", "color", "grandmaster"];
 export type YugiohFrameStyle = typeof YUGIOH_FRAME_STYLES[number];
 export declare const YUGIOH_RARITY_EFFECTS: readonly ["auto", "none", "dt", "ur", "ur-pendulum", "hr", "ser", "ser-pendulum", "pser2"];
 export type YugiohRarityEffect = typeof YUGIOH_RARITY_EFFECTS[number];

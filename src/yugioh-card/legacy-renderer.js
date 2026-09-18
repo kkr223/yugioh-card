@@ -599,7 +599,7 @@ var _ = {
 			"artBorderStyle",
 			"effectBorderStyle"
 		]) this.data[e] && this.data[e] !== "auto" && (t[e] = this.data[e]);
-		let n = t.cardBorderStyle === "default" ? "" : t.cardBorderStyle, a = t.artBorderStyle === "default" ? "" : t.artBorderStyle, o = (e) => e === "silver" ? "sliver" : e === "color" ? "gold" : e, s = a ? o(a) : "", c = t.effectBorderStyle === "default" ? "" : o(t.effectBorderStyle), l = t.effectBorderStyle === "color" ? "color" : "", u = this.data.type === "pendulum", d = e === "none" ? "" : `${this.baseImage}/rare-effect/rare-${e}.png`, f = u && e === "hr", p = v.width / _.width, h = v.height / _.height;
+		let n = t.cardBorderStyle === "default" ? "" : t.cardBorderStyle, a = t.artBorderStyle === "default" ? "" : t.artBorderStyle === "grandmaster" ? "color" : t.artBorderStyle, o = (e) => e === "silver" ? "sliver" : e === "grandmaster" ? "color" : e, s = a ? o(a) : "", c = t.effectBorderStyle === "default" ? "" : o(t.effectBorderStyle), l = ["color", "grandmaster"].includes(t.effectBorderStyle) ? t.effectBorderStyle : "", u = this.data.type === "pendulum", d = e === "none" ? "" : `${this.baseImage}/rare-effect/rare-${e}.png`, f = u && e === "hr", p = v.width / _.width, h = v.height / _.height;
 		this.rareLeaf.set({
 			url: d,
 			x: f ? v.x - _.x * p : 0,
@@ -636,7 +636,7 @@ var _ = {
 			url: l ? `${this.baseImage}/effect-border/eblock-border-${l}.png` : "",
 			x: 77,
 			y: 1501,
-			visible: !!l && !u,
+			visible: !!l && (!u || l === "grandmaster"),
 			zIndex: this.data.effectBorderStyle && this.data.effectBorderStyle !== "auto" ? 20.5 : 29
 		});
 	}

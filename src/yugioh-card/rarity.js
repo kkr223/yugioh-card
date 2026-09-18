@@ -4,7 +4,8 @@ var e = [
 	"default",
 	"silver",
 	"gold",
-	"color"
+	"color",
+	"grandmaster"
 ], t = [
 	"auto",
 	"none",
@@ -46,18 +47,16 @@ var r = {
 	gser: {
 		effect: "ser",
 		pendulumEffect: !0,
-		cardBorder: "color",
-		artBorder: "color",
-		pendulumFrame: "gold",
-		effectBorder: "color"
+		cardBorder: "gold",
+		artBorder: "gold",
+		pendulumFrame: "gold"
 	},
 	pser: {
 		effect: "ser",
 		pendulumEffect: !0,
 		cardBorder: "silver",
 		artBorder: "silver",
-		pendulumFrame: "sliver",
-		effectBorder: "color"
+		pendulumFrame: "sliver"
 	},
 	pser2: {
 		effect: "pser2",
@@ -65,14 +64,25 @@ var r = {
 		artBorder: "silver",
 		pendulumFrame: "sliver"
 	},
-	o: { cardBorder: "color" }
+	o: {
+		cardBorder: "color",
+		artBorder: "color",
+		pendulumFrame: "color",
+		effectBorder: "color"
+	},
+	grandmaster: {
+		cardBorder: "grandmaster",
+		artBorder: "color",
+		pendulumFrame: "color",
+		effectBorder: "grandmaster"
+	}
 };
 function i(e, t = "monster") {
 	let i = r[e.trim().toLowerCase()] ?? {}, a = t === "pendulum", o = (e) => e === "sliver" ? "silver" : e ?? "default";
 	return {
 		cardBorderStyle: o(i.cardBorder),
 		artBorderStyle: o(a ? i.pendulumFrame : i.artBorder),
-		effectBorderStyle: o(a ? i.pendulumFrame : i.effectBorder),
+		effectBorderStyle: o(i.effectBorder === "grandmaster" ? i.effectBorder : a ? i.pendulumFrame : i.effectBorder),
 		rarityEffect: n(e, t)
 	};
 }
