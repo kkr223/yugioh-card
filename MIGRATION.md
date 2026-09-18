@@ -99,6 +99,15 @@ foreground. The old
 `effectBlockBorderStyle: 'colored'` value remains supported for compatibility.
 Rarity values are now presets that compose the separate card border, artwork or
 pendulum frame, effect-box border, and `rare-effect/` overlay resources.
+`cardBorderStyle`, `artBorderStyle`, and `effectBorderStyle` override those three
+frame parts independently (`auto`, `default`, `silver`, `gold`, or `color`).
+They live under `frame` in structured documents. `auto` preserves legacy rarity
+behavior; `default` explicitly uses the base frame even when a rarity is selected.
+`getRarityFramePreset(rare, type)` from `yugioh-card-ts/document` returns explicit
+frame choices for editors that apply rarity once, then allow individual edits.
+Ordinary effect frames support default/color; pendulum artwork and effect frames
+support default/silver/gold. A color choice carried over to pendulum uses gold;
+silver/gold effect choices carried over to an ordinary card use its default frame.
 Use `foregroundCoverLevel: false` when the foreground image should stay behind
 level, rank, and link-marker overlays. Use `foregroundCoverAttribute: false`
 when it should also stay behind the attribute icon. Use

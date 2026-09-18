@@ -1,4 +1,5 @@
 import { CompressText as e } from "../compress-text/compress-text.js";
+import "./rarity.js";
 import { YUGIOH_LAYER_SLOTS as t, createYugiohCardDocument as n, legacyDataToYugiohCardDocument as r, parseYugiohCardDocument as i, yugiohCardDocumentToLegacyData as a } from "./document.js";
 import { LegacyYugiohCardRenderer as o } from "./legacy-renderer.js";
 import { Box as s, Group as c, Image as l, Rect as u } from "leafer-unified";
@@ -483,7 +484,7 @@ var b = class extends o {
 			visible: r,
 			zIndex: 28
 		});
-		let c = n.borderStyle === "colored" ? m.effectBox.coloredUrl : m.effectBox.defaultUrl;
+		let c = (e.frame.effectBorderStyle === "auto" ? n.borderStyle === "colored" : e.frame.effectBorderStyle === "color") ? m.effectBox.coloredUrl : m.effectBox.defaultUrl;
 		this.effectBoxBorderLeaf.set({
 			url: this.resourceUrl(c),
 			x: n.x,

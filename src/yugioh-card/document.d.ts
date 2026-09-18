@@ -1,3 +1,5 @@
+import { YugiohFrameStyle } from './rarity.js';
+export { YUGIOH_FRAME_STYLES, getRarityFramePreset, type YugiohFrameStyle } from './rarity.js';
 export declare const YUGIOH_CARD_DOCUMENT_KIND: "yugioh-card";
 export declare const YUGIOH_CARD_DOCUMENT_VERSION: 1;
 export declare const YUGIOH_CARD_LANGUAGES: readonly ["sc", "tc", "jp", "kr", "en", "astral", "custom1", "custom2"];
@@ -33,6 +35,9 @@ export interface YugiohCardDocument {
         pendulumScale: number;
         arrows: YugiohLinkArrow[];
         nameBlock: boolean;
+        cardBorderStyle: YugiohFrameStyle;
+        artBorderStyle: YugiohFrameStyle;
+        effectBorderStyle: YugiohFrameStyle;
     };
     title: {
         text: string;
@@ -157,6 +162,9 @@ export interface LegacyYugiohCardData {
     def?: number;
     arrowList?: number[];
     nameBlock?: boolean;
+    cardBorderStyle?: string;
+    artBorderStyle?: string;
+    effectBorderStyle?: string;
     outFrameNameBlock?: boolean;
     outFrameNameBlockEnabled?: boolean;
     description?: string;
@@ -216,4 +224,3 @@ export declare function createYugiohCardDocument(input?: DeepPartial<YugiohCardD
 export declare function parseYugiohCardDocument(value: unknown): YugiohCardDocument;
 export declare function legacyDataToYugiohCardDocument(data?: LegacyYugiohCardData, base?: YugiohCardDocument): YugiohCardDocument;
 export declare function yugiohCardDocumentToLegacyData(document: YugiohCardDocument): Required<LegacyYugiohCardData>;
-export {};
