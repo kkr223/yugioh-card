@@ -37,7 +37,11 @@ const preserveModulesOutput = {
 const buildLib = {
   outDir: 'dist',
   lib: {
-    entry: path.resolve(__dirname, 'packages/index.js'),
+    entry: {
+      index: path.resolve(__dirname, 'packages/index.js'),
+      'src/yugioh-card/document': path.resolve(__dirname, 'packages/src/yugioh-card/document.ts'),
+      'src/compress-text/index': path.resolve(__dirname, 'packages/src/compress-text/index.ts'),
+    },
     formats: ['es'],
   },
   rolldownOptions: {

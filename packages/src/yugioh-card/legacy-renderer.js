@@ -10,43 +10,7 @@ import enStyle from './style/en-style.ts';
 import astralStyle from './style/astral-style.ts';
 import custom1Style from './style/custom1-style.ts';
 import custom2Style from './style/custom2-style.ts';
-
-const RARITY_LAYER_PRESETS = {
-  dt: { effect: 'dt' },
-  ur: { effect: 'ur', pendulumEffect: true },
-  gr: { cardBorder: 'gold', artBorder: 'gold', pendulumFrame: 'gold' },
-  hr: {
-    effect: 'hr',
-    cardBorder: 'silver',
-    artBorder: 'silver',
-    pendulumFrame: 'sliver',
-    effectBorder: 'color',
-  },
-  ser: { effect: 'ser', pendulumEffect: true },
-  gser: {
-    effect: 'ser',
-    pendulumEffect: true,
-    cardBorder: 'color',
-    artBorder: 'color',
-    pendulumFrame: 'gold',
-    effectBorder: 'color',
-  },
-  pser: {
-    effect: 'ser',
-    pendulumEffect: true,
-    cardBorder: 'silver',
-    artBorder: 'silver',
-    pendulumFrame: 'sliver',
-    effectBorder: 'color',
-  },
-  pser2: {
-    effect: 'pser2',
-    cardBorder: 'silver',
-    artBorder: 'silver',
-    pendulumFrame: 'sliver',
-  },
-  o: { cardBorder: 'color' },
-};
+import { getRarityFramePreset, resolveRarityEffect } from './rarity.ts';
 
 const HR_EFFECT_SOURCE_FRAME = { x: 170, y: 375, width: 1054, height: 1054 };
 const HR_EFFECT_PENDULUM_FRAME = { x: 94, y: 364, width: 1205, height: 900 };
@@ -772,13 +736,23 @@ export class LegacyYugiohCardRenderer extends Card {
       this.leafer.add(this.rareEffectBorderLeaf);
     }
 
-    const preset = RARITY_LAYER_PRESETS[this.data.rare.trim().toLowerCase()] || {};
+    const effect = resolveRarityEffect(this.data.rare, this.data.type, this.data.rarityEffect);
+    const frames = getRarityFramePreset(this.data.rare, this.data.type);
+    for (const key of ['cardBorderStyle', 'artBorderStyle', 'effectBorderStyle']) {
+      if (this.data[key] && this.data[key] !== 'auto') frames[key] = this.data[key];
+    }
+    const cardBorder = frames.cardBorderStyle === 'default' ? '' : frames.cardBorderStyle;
+    const artBorder = frames.artBorderStyle === 'default' ? ''
+      : frames.artBorderStyle === 'grandmaster' ? 'color' : frames.artBorderStyle;
+    const pendulumStyle = style => style === 'silver' ? 'sliver' : style === 'grandmaster' ? 'color' : style;
+    const pendulumArt = artBorder ? pendulumStyle(artBorder) : '';
+    const pendulumEffect = frames.effectBorderStyle === 'default' ? '' : pendulumStyle(frames.effectBorderStyle);
+    const effectBorder = ['color', 'grandmaster'].includes(frames.effectBorderStyle) ? frames.effectBorderStyle : '';
     const isPendulum = this.data.type === 'pendulum';
-    const effectSuffix = isPendulum && preset.pendulumEffect ? '-pendulum' : '';
-    const rareUrl = preset.effect
-      ? `${this.baseImage}/rare-effect/rare-${preset.effect}${effectSuffix}.png`
+    const rareUrl = effect !== 'none'
+      ? `${this.baseImage}/rare-effect/rare-${effect}.png`
       : '';
-    const hrPendulum = isPendulum && preset.effect === 'hr';
+    const hrPendulum = isPendulum && effect === 'hr';
     const hrScaleX = HR_EFFECT_PENDULUM_FRAME.width / HR_EFFECT_SOURCE_FRAME.width;
     const hrScaleY = HR_EFFECT_PENDULUM_FRAME.height / HR_EFFECT_SOURCE_FRAME.height;
 
@@ -793,52 +767,52 @@ export class LegacyYugiohCardRenderer extends Card {
       width: hrPendulum ? this.cardWidth * hrScaleX : this.cardWidth,
       height: hrPendulum ? this.cardHeight * hrScaleY : this.cardHeight,
       cornerRadius: this.data.radius ? 24 : 0,
-      visible: Boolean(preset.effect),
+      visible: effect !== 'none',
       zIndex: 100,
     });
     this.rareCardBorderLeaf.set({
-      url: preset.cardBorder
-        ? `${this.baseImage}/card-border/card-border-${preset.cardBorder}.png`
+      url: cardBorder
+        ? `${this.baseImage}/card-border/card-border-${cardBorder}.png`
         : '',
       cornerRadius: this.data.radius ? 24 : 0,
-      visible: Boolean(preset.cardBorder),
+      visible: Boolean(cardBorder),
       zIndex: 20.5,
     });
     this.rareArtBorderLeaf.set({
-      url: preset.artBorder
-        ? `${this.baseImage}/art-border/art-frame-${preset.artBorder}.png`
+      url: artBorder
+        ? `${this.baseImage}/art-border/art-frame-${artBorder}.png`
         : '',
       x: 117,
       y: 322,
-      visible: Boolean(preset.artBorder) && !isPendulum,
+      visible: Boolean(artBorder) && !isPendulum,
       zIndex: 20.5,
     });
     this.rarePendulumArtBorderLeaf.set({
-      url: preset.pendulumFrame
-        ? `${this.baseImage}/pendulum-frame/pframe-art-${preset.pendulumFrame}.png`
+      url: pendulumArt
+        ? `${this.baseImage}/pendulum-frame/pframe-art-${pendulumArt}.png`
         : '',
       x: 68,
       y: 342,
-      visible: Boolean(preset.pendulumFrame) && isPendulum,
+      visible: Boolean(pendulumArt) && isPendulum,
       zIndex: 20.5,
     });
     this.rarePendulumEffectBorderLeaf.set({
-      url: preset.pendulumFrame
-        ? `${this.baseImage}/pendulum-frame/pframe-effect-${preset.pendulumFrame}.png`
+      url: pendulumEffect
+        ? `${this.baseImage}/pendulum-frame/pframe-effect-${pendulumEffect}.png`
         : '',
       x: 68,
       y: 1256,
-      visible: Boolean(preset.pendulumFrame) && isPendulum,
+      visible: Boolean(pendulumEffect) && isPendulum,
       zIndex: 22,
     });
     this.rareEffectBorderLeaf.set({
-      url: preset.effectBorder
-        ? `${this.baseImage}/effect-border/eblock-border-${preset.effectBorder}.png`
+      url: effectBorder
+        ? `${this.baseImage}/effect-border/eblock-border-${effectBorder}.png`
         : '',
       x: 77,
       y: 1501,
-      visible: Boolean(preset.effectBorder) && !isPendulum,
-      zIndex: 29,
+      visible: Boolean(effectBorder) && (!isPendulum || effectBorder === 'grandmaster'),
+      zIndex: this.data.effectBorderStyle && this.data.effectBorderStyle !== 'auto' ? 20.5 : 29,
     });
   }
 
@@ -997,7 +971,9 @@ export class LegacyYugiohCardRenderer extends Card {
   }
 
   get showAttributeRare() {
-    return this.showAttribute && ['hr', 'ser', 'gser', 'pser', 'pser2'].includes(this.data.rare);
+    return this.showAttribute && ['hr', 'ser', 'ser-pendulum', 'pser2'].includes(
+      resolveRarityEffect(this.data.rare, this.data.type, this.data.rarityEffect),
+    );
   }
 
   get showLevel() {

@@ -291,7 +291,7 @@ test('expands rarity presets into reusable border and effect layers', async () =
   assert.equal(internals.rareLeaf.y, 0);
   assert.equal(internals.rareLeaf.width, 1394);
   assert.equal(internals.rareLeaf.height, 2031);
-  assert.match(String(internals.rareCardBorderLeaf.url), /card-border-color\.png$/);
+  assert.match(String(internals.rareCardBorderLeaf.url), /card-border-gold\.png$/);
   assert.equal(internals.rareArtBorderLeaf.visible, false);
   assert.match(String(internals.rarePendulumArtBorderLeaf.url), /pframe-art-gold\.png$/);
   assert.equal(internals.rarePendulumArtBorderLeaf.visible, true);
@@ -302,13 +302,123 @@ test('expands rarity presets into reusable border and effect layers', async () =
   );
   assert.equal(internals.rareEffectBorderLeaf.visible, false);
 
+  card.setData({ type: 'monster', rare: 'gser' });
+  await card.whenReady();
+  assert.match(String(internals.rareLeaf.url), /rare-ser\.png$/);
+  assert.match(String(internals.rareCardBorderLeaf.url), /card-border-gold\.png$/);
+  assert.match(String(internals.rareArtBorderLeaf.url), /art-frame-gold\.png$/);
+  assert.equal(internals.rareArtBorderLeaf.visible, true);
+  assert.equal(internals.rareEffectBorderLeaf.visible, false);
+
   card.setData({ type: 'monster', rare: 'gr' });
   await card.whenReady();
   assert.equal(internals.rareLeaf.visible, false);
   assert.match(String(internals.rareCardBorderLeaf.url), /card-border-gold\.png$/);
   assert.match(String(internals.rareArtBorderLeaf.url), /art-frame-gold\.png$/);
   assert.equal(internals.rareArtBorderLeaf.visible, true);
+  card.setData({ rare: 'pser' });
+  await card.whenReady();
+  assert.match(String(internals.rareLeaf.url), /rare-ser\.png$/);
+  assert.match(String(internals.rareArtBorderLeaf.url), /art-frame-silver\.png$/);
+  assert.equal(internals.rareEffectBorderLeaf.visible, false);
+  card.setData({ rare: 'o' });
+  await card.whenReady();
+  assert.match(String(internals.rareEffectBorderLeaf.url), /eblock-border-color\.png$/);
+  assert.equal(internals.rareEffectBorderLeaf.visible, true);
   card.destroy();
+});
+
+test('keeps frame overrides independent of rarity and each other', async () => {
+  const card = new YugiohCard({ resourcePath, skia, data: {
+    rare: 'hr', cardBorderStyle: 'gold', artBorderStyle: 'color',
+    effectBorderStyle: 'default', scale: 0.1,
+  } });
+  try {
+    await card.whenReady();
+    const leaves = card as unknown as Record<string, { url?: string; visible?: boolean }>;
+    assert.match(String(leaves.rareCardBorderLeaf.url), /card-border-gold\.png$/);
+    assert.match(String(leaves.rareArtBorderLeaf.url), /art-frame-color\.png$/);
+    assert.equal(leaves.rareEffectBorderLeaf.visible, false);
+    assert.match(String(leaves.rareLeaf.url), /rare-hr\.png$/);
+    card.setData({ rare: 'pser', cardBorderStyle: 'default' });
+    await card.whenReady();
+    assert.equal(leaves.rareCardBorderLeaf.visible, false);
+    assert.match(String(leaves.rareArtBorderLeaf.url), /art-frame-color\.png$/);
+    card.setData({ type: 'pendulum', artBorderStyle: 'silver', effectBorderStyle: 'gold' });
+    await card.whenReady();
+    assert.match(String(leaves.rarePendulumArtBorderLeaf.url), /pframe-art-sliver\.png$/);
+    assert.match(String(leaves.rarePendulumEffectBorderLeaf.url), /pframe-effect-gold\.png$/);
+    const restored = createYugiohCardDocument(JSON.parse(JSON.stringify(card.getDocument())));
+    assert.equal(restored.frame.artBorderStyle, 'silver');
+    assert.equal(restored.frame.effectBorderStyle, 'gold');
+  } finally {
+    card.destroy();
+  }
+});
+
+test('composes out-frame and grandmaster frames with the correct foreground order', async () => {
+  const card = new YugiohCard({ resourcePath, skia, data: {
+    rare: 'o', scale: 0.1,
+    foregroundImage: 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==',
+    foregroundWidth: 200, foregroundHeight: 300,
+    effectBlockEnabled: true, effectBlockBorder: true,
+  } });
+  try {
+    const leaves = card as unknown as Record<string, { url?: string; visible?: boolean; zIndex?: number }>;
+    for (const rare of ['o', 'grandmaster']) {
+      for (const type of ['monster', 'pendulum']) {
+        card.setData({ rare, type });
+        await card.whenReady();
+        assert.match(String(leaves.rareCardBorderLeaf.url), new RegExp(`card-border-${rare === 'o' ? 'color' : 'grandmaster'}\\.png$`));
+        const art = type === 'pendulum' ? leaves.rarePendulumArtBorderLeaf : leaves.rareArtBorderLeaf;
+        assert.equal(art.visible, true);
+        assert.match(String(art.url), /(?:pframe-art|art-frame)-color\.png$/);
+        assert.ok(Number(art.zIndex) < Number(leaves.foregroundLeaf.zIndex));
+        if (type === 'pendulum') {
+          assert.equal(leaves.rarePendulumEffectBorderLeaf.visible, true);
+          assert.match(String(leaves.rarePendulumEffectBorderLeaf.url), /pframe-effect-color\.png$/);
+          assert.ok(Number(leaves.rarePendulumEffectBorderLeaf.zIndex) > Number(leaves.foregroundLeaf.zIndex));
+        }
+        if (rare === 'grandmaster') {
+          assert.equal(leaves.rareEffectBorderLeaf.visible, true);
+          assert.match(String(leaves.rareEffectBorderLeaf.url), /eblock-border-grandmaster\.png$/);
+          assert.match(String(leaves.effectBoxBorderLeaf.url), /eblock-border-grandmaster\.png$/);
+          assert.equal(leaves.rareLeaf.visible, false);
+        }
+        const exported = await card.export('png', { density: 1 }) as { data: string };
+        assert.match(exported.data, /^data:image\/png;base64,/);
+      }
+    }
+  } finally {
+    card.destroy();
+  }
+});
+
+test('switches independent effects, masks and overlay policies without changing frames', async () => {
+  const card = new YugiohCard({ resourcePath, skia, data: {
+    rare: 'gr', rarityEffect: 'pser2', name: 'Independent effect', scale: 0.1,
+  } });
+  try {
+    await card.whenReady();
+    const leaves = card as unknown as Record<string, { url?: string; visible?: boolean; blendMode?: string; zIndex?: number }>;
+    assert.match(String(leaves.rareLeaf.url), /rare-pser2\.png$/);
+    assert.equal(leaves.rarityMaskLayer.blendMode, 'hard-light');
+    assert.equal(leaves.nameLeaf.zIndex, 102);
+    assert.match(String(leaves.rareCardBorderLeaf.url), /card-border-gold\.png$/);
+    card.setData({ rarityEffect: 'ser-pendulum' });
+    await card.whenReady();
+    assert.match(String(leaves.rareLeaf.url), /rare-ser-pendulum\.png$/);
+    assert.equal(leaves.rarityMaskLayer.blendMode, 'pass-through');
+    assert.equal(leaves.nameLeaf.zIndex, 23);
+    card.setData({ rarityEffect: 'none' });
+    await card.whenReady();
+    assert.equal(leaves.rareLeaf.visible, false);
+    assert.equal(leaves.rarityMaskLayer.visible, false);
+    assert.match(String(leaves.rareCardBorderLeaf.url), /card-border-gold\.png$/);
+    assert.equal(card.getDocument().footer.rarityEffect, 'none');
+  } finally {
+    card.destroy();
+  }
 });
 
 test('renders pser2 through an adjustable grayscale rarity mask', async () => {

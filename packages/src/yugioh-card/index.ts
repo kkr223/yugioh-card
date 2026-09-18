@@ -11,6 +11,7 @@ import {
   type YugiohCardLayerSlot,
 } from './document.ts';
 import { LegacyYugiohCardRenderer } from './legacy-renderer.js';
+import { getRarityFramePreset, resolveRarityEffect } from './rarity.ts';
 import type { CardOptions } from '../card/index.ts';
 
 export interface CardLayerExtensionContext {
@@ -154,6 +155,7 @@ const OUT_FRAME_LAYOUT = {
   effectBox: {
     defaultUrl: '/yugioh/image/effect-border/eblock-border.png',
     coloredUrl: '/yugioh/image/effect-border/eblock-border-color.png',
+    grandmasterUrl: '/yugioh/image/effect-border/eblock-border-grandmaster.png',
   },
   mark25th: {
     url: '/yugioh/image/watermark/mark25th.png',
@@ -552,10 +554,11 @@ export class YugiohCard extends LegacyYugiohCardRenderer {
       && rarityMask.width > 0
       && rarityMask.height > 0
       && rarityMask.scale > 0;
-    const active = Boolean(document.footer.rare)
+    const effect = resolveRarityEffect(document.footer.rare, document.frame.type, document.footer.rarityEffect);
+    const active = effect !== 'none'
       && (customMaskVisible || rarityMask.maskEffectBox || rarityMask.maskArtwork);
-    const rareZIndex = document.footer.rare === 'o' ? 20.5 : 100;
-    const rareBlendMode = document.footer.rare === 'pser2' ? 'hard-light' : 'pass-through';
+    const rareZIndex = 100;
+    const rareBlendMode = effect === 'pser2' ? 'hard-light' : 'pass-through';
 
     if (!active) {
       this.leafer.add(rareLeaf);
@@ -773,7 +776,7 @@ export class YugiohCard extends LegacyYugiohCardRenderer {
 
   private applyForegroundTitlePolicy(document: YugiohCardDocument): void {
     const renderer = this as unknown as LegacyRendererShape;
-    const titleAboveRarity = document.footer.rare === 'pser2'
+    const titleAboveRarity = resolveRarityEffect(document.footer.rare, document.frame.type, document.footer.rarityEffect) === 'pser2'
       && !document.rarityMask.coverName;
     this.titleShadowLeaf?.set({ zIndex: titleAboveRarity ? 101 : 22 });
     renderer.nameLeaf?.set({ zIndex: titleAboveRarity ? 102 : 23 });
@@ -781,7 +784,7 @@ export class YugiohCard extends LegacyYugiohCardRenderer {
 
   private applyForegroundOverlayPolicy(document: YugiohCardDocument): void {
     const renderer = this as unknown as LegacyRendererShape;
-    const pser2 = document.footer.rare === 'pser2';
+    const pser2 = resolveRarityEffect(document.footer.rare, document.frame.type, document.footer.rarityEffect) === 'pser2';
     const levelZIndex = pser2 && !document.rarityMask.coverLevel
       ? 101
       : document.foreground.coverLevel ? 10 : 22;
@@ -838,7 +841,15 @@ export class YugiohCard extends LegacyYugiohCardRenderer {
       visible: fillVisible,
       zIndex: 28,
     });
-    const borderUrl = effectBox.borderStyle === 'colored'
+    const coloredBorder = document.frame.effectBorderStyle === 'auto'
+      ? effectBox.borderStyle === 'colored'
+      : document.frame.effectBorderStyle === 'color';
+    const frameEffectStyle = document.frame.effectBorderStyle === 'auto'
+      ? getRarityFramePreset(document.footer.rare, document.frame.type).effectBorderStyle
+      : document.frame.effectBorderStyle;
+    const borderUrl = frameEffectStyle === 'grandmaster'
+      ? OUT_FRAME_LAYOUT.effectBox.grandmasterUrl
+      : coloredBorder
       ? OUT_FRAME_LAYOUT.effectBox.coloredUrl
       : OUT_FRAME_LAYOUT.effectBox.defaultUrl;
     this.effectBoxBorderLeaf.set({

@@ -55,6 +55,12 @@ try {
   if (typeof library.YugiohCard !== 'function') {
     throw new Error('Installed package does not export YugiohCard');
   }
+  const documentApi = await import(pathToFileURL(path.join(
+    temporaryDirectory, 'node_modules', 'yugioh-card-ts', 'src', 'yugioh-card', 'document.js',
+  )).href);
+  if (documentApi.getRarityFramePreset('hr').cardBorderStyle !== 'silver') {
+    throw new Error('Installed document entry does not export rarity frame presets');
+  }
   console.log('Installed package smoke test passed');
 } finally {
   fs.rmSync(temporaryDirectory, { recursive: true, force: true });

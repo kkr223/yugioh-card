@@ -1,3 +1,7 @@
+import { YUGIOH_FRAME_STYLES, YUGIOH_RARITY_EFFECTS, type YugiohFrameStyle, type YugiohRarityEffect } from './rarity.ts';
+export { YUGIOH_RARITY_EFFECTS, resolveRarityEffect, type YugiohRarityEffect } from './rarity.ts';
+export { YUGIOH_FRAME_STYLES, getRarityFramePreset, type YugiohFrameStyle } from './rarity.ts';
+
 export const YUGIOH_CARD_DOCUMENT_KIND = 'yugioh-card' as const;
 export const YUGIOH_CARD_DOCUMENT_VERSION = 1 as const;
 
@@ -68,6 +72,9 @@ export interface YugiohCardDocument {
     pendulumScale: number;
     arrows: YugiohLinkArrow[];
     nameBlock: boolean;
+    cardBorderStyle: YugiohFrameStyle;
+    artBorderStyle: YugiohFrameStyle;
+    effectBorderStyle: YugiohFrameStyle;
   };
   title: {
     text: string;
@@ -149,6 +156,7 @@ export interface YugiohCardDocument {
     copyright: string;
     laser: string;
     rare: string;
+    rarityEffect: YugiohRarityEffect;
     twentieth: boolean;
     mark25th: boolean;
   };
@@ -193,6 +201,9 @@ export interface LegacyYugiohCardData {
   def?: number;
   arrowList?: number[];
   nameBlock?: boolean;
+  cardBorderStyle?: string;
+  artBorderStyle?: string;
+  effectBorderStyle?: string;
   outFrameNameBlock?: boolean;
   outFrameNameBlockEnabled?: boolean;
   description?: string;
@@ -205,6 +216,7 @@ export interface LegacyYugiohCardData {
   copyright?: string;
   laser?: string;
   rare?: string;
+  rarityEffect?: string;
   twentieth?: boolean;
   radius?: boolean;
   scale?: number;
@@ -276,6 +288,9 @@ const DEFAULT_DOCUMENT: YugiohCardDocument = {
     pendulumScale: 0,
     arrows: [],
     nameBlock: false,
+    cardBorderStyle: 'auto',
+    artBorderStyle: 'auto',
+    effectBorderStyle: 'auto',
   },
   title: {
     text: '',
@@ -357,6 +372,7 @@ const DEFAULT_DOCUMENT: YugiohCardDocument = {
     copyright: '',
     laser: '',
     rare: '',
+    rarityEffect: 'auto',
     twentieth: false,
     mark25th: false,
   },
@@ -530,6 +546,9 @@ export function parseYugiohCardDocument(value: unknown): YugiohCardDocument {
       pendulumScale: numberAt(frame.pendulumScale, 'frame.pendulumScale'),
       arrows: [...arrows] as YugiohLinkArrow[],
       nameBlock: optionalBooleanAt(frame.nameBlock, false, 'frame.nameBlock'),
+      cardBorderStyle: enumAt(frame.cardBorderStyle ?? 'auto', YUGIOH_FRAME_STYLES, 'frame.cardBorderStyle'),
+      artBorderStyle: enumAt(frame.artBorderStyle ?? 'auto', YUGIOH_FRAME_STYLES, 'frame.artBorderStyle'),
+      effectBorderStyle: enumAt(frame.effectBorderStyle ?? 'auto', YUGIOH_FRAME_STYLES, 'frame.effectBorderStyle'),
     },
     title: {
       text: stringAt(title.text, 'title.text'),
@@ -664,6 +683,7 @@ export function parseYugiohCardDocument(value: unknown): YugiohCardDocument {
       copyright: stringAt(footer.copyright, 'footer.copyright'),
       laser: stringAt(footer.laser, 'footer.laser'),
       rare: stringAt(footer.rare, 'footer.rare'),
+      rarityEffect: enumAt(footer.rarityEffect ?? 'auto', YUGIOH_RARITY_EFFECTS, 'footer.rarityEffect'),
       twentieth: booleanAt(footer.twentieth, 'footer.twentieth'),
       mark25th: optionalBooleanAt(footer.mark25th, false, 'footer.mark25th'),
     },
@@ -747,6 +767,9 @@ export function legacyDataToYugiohCardDocument(
       rank: numberValue(data.rank, base.frame.rank),
       pendulumScale: numberValue(data.pendulumScale, base.frame.pendulumScale),
       arrows,
+      cardBorderStyle: enumValue(data.cardBorderStyle, YUGIOH_FRAME_STYLES, base.frame.cardBorderStyle),
+      artBorderStyle: enumValue(data.artBorderStyle, YUGIOH_FRAME_STYLES, base.frame.artBorderStyle),
+      effectBorderStyle: enumValue(data.effectBorderStyle, YUGIOH_FRAME_STYLES, base.frame.effectBorderStyle),
       nameBlock: booleanValue(
         data.nameBlock ?? data.outFrameNameBlock ?? data.outFrameNameBlockEnabled,
         base.frame.nameBlock,
@@ -896,6 +919,7 @@ export function legacyDataToYugiohCardDocument(
       copyright: stringValue(data.copyright, base.footer.copyright),
       laser: stringValue(data.laser, base.footer.laser),
       rare: stringValue(data.rare, base.footer.rare),
+      rarityEffect: enumValue(data.rarityEffect, YUGIOH_RARITY_EFFECTS, base.footer.rarityEffect),
       twentieth: booleanValue(data.twentieth, base.footer.twentieth),
       mark25th: booleanValue(data.mark25th ?? data.twentyFifth, base.footer.mark25th),
     },
@@ -939,6 +963,9 @@ export function yugiohCardDocumentToLegacyData(
     rank: value.frame.rank,
     pendulumScale: value.frame.pendulumScale,
     nameBlock: value.frame.nameBlock,
+    cardBorderStyle: value.frame.cardBorderStyle,
+    artBorderStyle: value.frame.artBorderStyle,
+    effectBorderStyle: value.frame.effectBorderStyle,
     outFrameNameBlock: value.frame.nameBlock,
     outFrameNameBlockEnabled: value.frame.nameBlock,
     pendulumDescription: value.text.pendulumDescription,
@@ -957,6 +984,7 @@ export function yugiohCardDocumentToLegacyData(
     copyright: value.footer.copyright,
     laser: value.footer.laser,
     rare: value.footer.rare,
+    rarityEffect: value.footer.rarityEffect,
     twentieth: value.footer.twentieth,
     mark25th: value.footer.mark25th,
     twentyFifth: value.footer.mark25th,
