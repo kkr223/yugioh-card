@@ -21,6 +21,7 @@ export class LegacyYugiohCardRenderer extends Card<Record<string, unknown>> {
     laserLeaf: null;
     rareLeaf: null;
     rareCardBorderLeaf: null;
+    defaultCardBorderLeaf: null;
     rareArtBorderLeaf: null;
     rarePendulumArtBorderLeaf: null;
     rarePendulumEffectBorderLeaf: null;
@@ -71,6 +72,7 @@ export class LegacyYugiohCardRenderer extends Card<Record<string, unknown>> {
     drawAttribute(): void;
     drawLevel(): void;
     drawRank(): void;
+    drawStars(key: any, count: any, visible: any): void;
     drawSpellTrap(): void;
     drawImage(): void;
     drawMask(): void;

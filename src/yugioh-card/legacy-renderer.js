@@ -2,27 +2,28 @@ import { numberToFull as e } from "../utils/index.js";
 import { Card as t } from "../card/index.js";
 import { CompressText as n } from "../compress-text/compress-text.js";
 import { getRarityFramePreset as r, resolveRarityEffect as i } from "./rarity.js";
-import a from "./style/sc-style.js";
-import o from "./style/tc-style.js";
-import s from "./style/jp-style.js";
-import c from "./style/kr-style.js";
-import l from "./style/en-style.js";
-import u from "./style/astral-style.js";
-import d from "./style/custom1-style.js";
-import f from "./style/custom2-style.js";
-import { Group as p, Image as m, Rect as h, Text as g } from "leafer-unified";
+import { resolveFrameOptions as a } from "./frame-options.js";
+import o from "./style/sc-style.js";
+import s from "./style/tc-style.js";
+import c from "./style/jp-style.js";
+import l from "./style/kr-style.js";
+import u from "./style/en-style.js";
+import d from "./style/astral-style.js";
+import f from "./style/custom1-style.js";
+import p from "./style/custom2-style.js";
+import { Group as m, Image as h, Rect as g, Text as _ } from "leafer-unified";
 //#region packages/src/yugioh-card/legacy-renderer.js
-var _ = {
+var v = {
 	x: 170,
 	y: 375,
 	width: 1054,
 	height: 1054
-}, v = {
+}, y = {
 	x: 94,
 	y: 364,
 	width: 1205,
 	height: 900
-}, y = class extends t {
+}, b = class extends t {
 	cardLeaf = null;
 	nameLeaf = null;
 	attributeLeaf = null;
@@ -43,6 +44,7 @@ var _ = {
 	laserLeaf = null;
 	rareLeaf = null;
 	rareCardBorderLeaf = null;
+	defaultCardBorderLeaf = null;
 	rareArtBorderLeaf = null;
 	rarePendulumArtBorderLeaf = null;
 	rarePendulumEffectBorderLeaf = null;
@@ -99,7 +101,7 @@ var _ = {
 		this.drawCard(), this.drawName(), this.drawAttribute(), this.drawLevel(), this.drawRank(), this.drawSpellTrap(), this.drawImage(), this.drawMask(), this.drawPendulum(), this.drawPendulumDescription(), this.drawPackage(), this.drawLinkArrow(), this.drawEffect(), this.drawDescription(), this.drawAtkDefLink(), this.drawPassword(), this.drawCopyright(), this.drawLaser(), this.drawRare(), this.drawAttributeRare(), this.drawTwentieth(), this.updateScale();
 	}
 	drawCard() {
-		this.cardLeaf || (this.cardLeaf = new m(), this.leafer.add(this.cardLeaf)), this.cardLeaf.set({
+		this.cardLeaf || (this.cardLeaf = new h(), this.leafer.add(this.cardLeaf)), this.cardLeaf.set({
 			url: this.cardUrl,
 			cornerRadius: this.data.radius ? 24 : 0,
 			zIndex: 0
@@ -130,7 +132,7 @@ var _ = {
 		});
 	}
 	drawAttribute() {
-		this.attributeLeaf || (this.attributeLeaf = new m(), this.leafer.add(this.attributeLeaf)), this.attributeLeaf.set({
+		this.attributeLeaf || (this.attributeLeaf = new h(), this.leafer.add(this.attributeLeaf)), this.attributeLeaf.set({
 			url: this.attributeUrl,
 			x: 1163,
 			y: 96,
@@ -139,58 +141,36 @@ var _ = {
 		});
 	}
 	drawLevel() {
-		if (!this.levelLeaf) {
-			this.levelLeaf = new p();
-			for (let e = 0; e < 13; e++) {
-				let e = new m();
-				this.levelLeaf.add(e);
-			}
-			this.leafer.add(this.levelLeaf);
-		}
-		let e = `${this.baseImage}/level/level.png`, t = this.data.level < 13 ? 147 : 101;
-		this.levelLeaf.children.forEach((n, r) => {
-			n.set({
-				url: e,
-				x: this.cardWidth - t - r * 92,
-				y: 247,
-				around: {
-					type: "percent",
-					x: 1,
-					y: 0
-				},
-				visible: r < this.data.level
-			});
-		}), this.levelLeaf.set({
-			visible: this.showLevel,
-			zIndex: 10
-		});
+		this.drawStars("levelLeaf", this.data.level, this.showLevel);
 	}
 	drawRank() {
-		if (!this.rankLeaf) {
-			this.rankLeaf = new p();
-			for (let e = 0; e < 13; e++) {
-				let e = new m();
-				this.rankLeaf.add(e);
-			}
-			this.leafer.add(this.rankLeaf);
+		this.drawStars("rankLeaf", this.data.rank, this.showRank);
+	}
+	drawStars(e, t, n) {
+		if (!this[e]) {
+			this[e] = new m();
+			for (let t = 0; t < 13; t++) this[e].add(new h());
+			this.leafer.add(this[e]);
 		}
-		let e = `${this.baseImage}/level/rank.png`, t = this.data.rank < 13 ? 147 : 101;
-		this.rankLeaf.children.forEach((n, r) => {
-			n.set({
-				url: e,
-				x: t + r * 92,
+		let { levelAlign: r, levelStyle: i } = a(this.data), o = Math.min(13, Math.max(0, Math.ceil(t))), s = Math.max(0, o * 92 - 4), c = o < 13 ? 147 : 101, l = r === "left" ? c : r === "center" ? (this.cardWidth - s) / 2 : this.cardWidth - c - s;
+		this[e].children.forEach((e, t) => {
+			e.set({
+				url: `${this.baseImage}/level/${i}.png`,
+				x: l + t * 92,
 				y: 247,
-				visible: r < this.data.rank
+				width: 88,
+				height: 88,
+				visible: t < o
 			});
-		}), this.rankLeaf.set({
-			visible: this.showRank,
+		}), this[e].set({
+			visible: n,
 			zIndex: 10
 		});
 	}
 	drawSpellTrap() {
 		if (!this.spellTrapLeaf) {
-			this.spellTrapLeaf = new p();
-			let e = new n(), t = new m(), r = new n();
+			this.spellTrapLeaf = new m();
+			let e = new n(), t = new h(), r = new n();
 			this.spellTrapLeaf.add(e), this.spellTrapLeaf.add(t), this.spellTrapLeaf.add(r), this.leafer.add(this.spellTrapLeaf);
 		}
 		let { spellTrap: e } = this.style, { icon: t } = e, r = this.data.icon ? `${this.baseImage}/icon/icon-${this.data.icon}.png` : "", i = this.data.icon ? 72 : 0, a = ["en", "kr"].includes(this.data.language) ? "[" : "【", o = ["en", "kr"].includes(this.data.language) ? "]" : "】", s = e.letterSpacing || 0, c = e.wordSpacing || 0, l = this.spellTrapLeaf.children[0], u = this.spellTrapLeaf.children[1], d = this.spellTrapLeaf.children[2];
@@ -220,14 +200,14 @@ var _ = {
 			rtFontScaleX: e.rtFontScaleX || 1,
 			y: e.top
 		});
-		let h = d.bounds;
-		d.x = u.x - (this.data.icon && t.marginLeft || 0) - h.width, this.spellTrapLeaf.set({
+		let p = d.bounds;
+		d.x = u.x - (this.data.icon && t.marginLeft || 0) - p.width, this.spellTrapLeaf.set({
 			visible: ["spell", "trap"].includes(this.data.type),
 			zIndex: 10
 		});
 	}
 	drawImage() {
-		this.imageLeaf || (this.imageLeaf = new h(), this.listenImageStatus(this.imageLeaf), this.leafer.add(this.imageLeaf)), this.imageLeaf.set({
+		this.imageLeaf || (this.imageLeaf = new g(), this.listenImageStatus(this.imageLeaf), this.leafer.add(this.imageLeaf)), this.imageLeaf.set({
 			width: this.data.type === "pendulum" ? 1205 : 1054,
 			height: this.data.type === "pendulum" ? 1205 : 1054,
 			x: this.data.type === "pendulum" ? 94 : 170,
@@ -243,7 +223,7 @@ var _ = {
 		});
 	}
 	drawMask() {
-		this.maskLeaf || (this.maskLeaf = new m(), this.leafer.add(this.maskLeaf));
+		this.maskLeaf || (this.maskLeaf = new h(), this.leafer.add(this.maskLeaf));
 		let e = this.data.type === "pendulum" ? `${this.baseImage}/pendulum-frame/pframe-art-base.png` : `${this.baseImage}/art-border/art-frame-base.png`;
 		this.maskLeaf.set({
 			url: e,
@@ -254,8 +234,8 @@ var _ = {
 	}
 	drawPendulum() {
 		if (!this.pendulumLeaf) {
-			this.pendulumLeaf = new p();
-			let e = new g(), t = new g();
+			this.pendulumLeaf = new m();
+			let e = new _(), t = new _();
 			this.pendulumLeaf.add(e), this.pendulumLeaf.add(t), this.leafer.add(this.pendulumLeaf);
 		}
 		let e = this.pendulumLeaf.children[0], t = this.pendulumLeaf.children[1], n = this.data.language === "astral" ? 144 : 145;
@@ -330,9 +310,9 @@ var _ = {
 	}
 	drawLinkArrow() {
 		if (!this.linkArrowLeaf) {
-			this.linkArrowLeaf = new p();
+			this.linkArrowLeaf = new m();
 			for (let e = 0; e < 8; e++) {
-				let e = new m();
+				let e = new h();
 				this.linkArrowLeaf.add(e);
 			}
 			this.leafer.add(this.linkArrowLeaf);
@@ -486,8 +466,8 @@ var _ = {
 	}
 	drawAtkDefLink() {
 		if (!this.atkDefLinkLeaf) {
-			this.atkDefLinkLeaf = new p();
-			let e = new m(), t = new g(), n = new g(), r = new g();
+			this.atkDefLinkLeaf = new m();
+			let e = new h(), t = new _(), n = new _(), r = new _();
 			this.atkDefLinkLeaf.add(e), this.atkDefLinkLeaf.add(t), this.atkDefLinkLeaf.add(n), this.atkDefLinkLeaf.add(r), this.leafer.add(this.atkDefLinkLeaf);
 		}
 		let t = this.atkDefLinkLeaf.children[0], n = this.atkDefLinkLeaf.children[1], r = this.atkDefLinkLeaf.children[2], i = this.atkDefLinkLeaf.children[3];
@@ -565,7 +545,7 @@ var _ = {
 		});
 	}
 	drawCopyright() {
-		this.copyrightLeaf || (this.copyrightLeaf = new m(), this.leafer.add(this.copyrightLeaf));
+		this.copyrightLeaf || (this.copyrightLeaf = new h(), this.leafer.add(this.copyrightLeaf));
 		let e = this.data.type === "monster" && this.data.cardType === "xyz" ? "white" : "black", t = this.data.copyright ? `${this.baseImage}/copyright/copyright-${this.data.copyright}-${e}.svg` : "";
 		this.copyrightLeaf.set({
 			url: t,
@@ -581,7 +561,7 @@ var _ = {
 		});
 	}
 	drawLaser() {
-		this.laserLeaf || (this.laserLeaf = new m(), this.leafer.add(this.laserLeaf));
+		this.laserLeaf || (this.laserLeaf = new h(), this.leafer.add(this.laserLeaf));
 		let e = this.data.laser ? `${this.baseImage}/fp-mark/${this.data.laser}.png` : "";
 		this.laserLeaf.set({
 			url: e,
@@ -592,20 +572,31 @@ var _ = {
 		});
 	}
 	drawRare() {
-		this.rareLeaf || (this.rareLeaf = new m(), this.leafer.add(this.rareLeaf)), this.rareCardBorderLeaf || (this.rareCardBorderLeaf = new m(), this.leafer.add(this.rareCardBorderLeaf)), this.rareArtBorderLeaf || (this.rareArtBorderLeaf = new m(), this.leafer.add(this.rareArtBorderLeaf)), this.rarePendulumArtBorderLeaf || (this.rarePendulumArtBorderLeaf = new m(), this.leafer.add(this.rarePendulumArtBorderLeaf)), this.rarePendulumEffectBorderLeaf || (this.rarePendulumEffectBorderLeaf = new m(), this.leafer.add(this.rarePendulumEffectBorderLeaf)), this.rareEffectBorderLeaf || (this.rareEffectBorderLeaf = new m(), this.leafer.add(this.rareEffectBorderLeaf));
+		this.rareLeaf || (this.rareLeaf = new h(), this.leafer.add(this.rareLeaf)), this.rareCardBorderLeaf || (this.rareCardBorderLeaf = new h(), this.leafer.add(this.rareCardBorderLeaf)), this.rareArtBorderLeaf || (this.rareArtBorderLeaf = new h(), this.leafer.add(this.rareArtBorderLeaf)), this.rarePendulumArtBorderLeaf || (this.rarePendulumArtBorderLeaf = new h(), this.leafer.add(this.rarePendulumArtBorderLeaf)), this.rarePendulumEffectBorderLeaf || (this.rarePendulumEffectBorderLeaf = new h(), this.leafer.add(this.rarePendulumEffectBorderLeaf)), this.rareEffectBorderLeaf || (this.rareEffectBorderLeaf = new h(), this.leafer.add(this.rareEffectBorderLeaf));
 		let e = i(this.data.rare, this.data.type, this.data.rarityEffect), t = r(this.data.rare, this.data.type);
 		for (let e of [
 			"cardBorderStyle",
 			"artBorderStyle",
 			"effectBorderStyle"
 		]) this.data[e] && this.data[e] !== "auto" && (t[e] = this.data[e]);
-		let n = t.cardBorderStyle === "default" ? "" : t.cardBorderStyle, a = t.artBorderStyle === "default" ? "" : t.artBorderStyle === "grandmaster" ? "color" : t.artBorderStyle, o = (e) => e === "silver" ? "sliver" : e === "grandmaster" ? "color" : e, s = a ? o(a) : "", c = t.effectBorderStyle === "default" ? "" : o(t.effectBorderStyle), l = ["color", "grandmaster"].includes(t.effectBorderStyle) ? t.effectBorderStyle : "", u = this.data.type === "pendulum", d = e === "none" ? "" : `${this.baseImage}/rare-effect/rare-${e}.png`, f = u && e === "hr", p = v.width / _.width, h = v.height / _.height;
+		let n = t.cardBorderStyle === "default" ? "" : t.cardBorderStyle, { cardBorderCoverForeground: o } = a(this.data);
+		!this.defaultCardBorderLeaf && !n && o && (this.defaultCardBorderLeaf = new m(), this.defaultCardBorderLeaf.add(new h({
+			url: `${this.baseImage}/card-border/card-border-silver.png`,
+			mask: "alpha"
+		})), this.defaultCardBorderLeaf.add(new h()), this.leafer.add(this.defaultCardBorderLeaf)), this.defaultCardBorderLeaf && (this.defaultCardBorderLeaf.children[1].set({
+			url: this.cardUrl,
+			cornerRadius: this.data.radius ? 24 : 0
+		}), this.defaultCardBorderLeaf.set({
+			visible: !n && o,
+			zIndex: 21.5
+		}));
+		let s = t.artBorderStyle === "default" ? "" : t.artBorderStyle === "grandmaster" ? "color" : t.artBorderStyle, c = (e) => e === "silver" ? "sliver" : e === "grandmaster" ? "color" : e, l = s ? c(s) : "", u = t.effectBorderStyle === "default" ? "" : c(t.effectBorderStyle), d = ["color", "grandmaster"].includes(t.effectBorderStyle) ? t.effectBorderStyle : "", f = this.data.type === "pendulum", p = e === "none" ? "" : `${this.baseImage}/rare-effect/rare-${e}.png`, g = f && e === "hr", _ = y.width / v.width, b = y.height / v.height;
 		this.rareLeaf.set({
-			url: d,
-			x: f ? v.x - _.x * p : 0,
-			y: f ? v.y - _.y * h : 0,
-			width: f ? this.cardWidth * p : this.cardWidth,
-			height: f ? this.cardHeight * h : this.cardHeight,
+			url: p,
+			x: g ? y.x - v.x * _ : 0,
+			y: g ? y.y - v.y * b : 0,
+			width: g ? this.cardWidth * _ : this.cardWidth,
+			height: g ? this.cardHeight * b : this.cardHeight,
 			cornerRadius: this.data.radius ? 24 : 0,
 			visible: e !== "none",
 			zIndex: 100
@@ -613,35 +604,35 @@ var _ = {
 			url: n ? `${this.baseImage}/card-border/card-border-${n}.png` : "",
 			cornerRadius: this.data.radius ? 24 : 0,
 			visible: !!n,
-			zIndex: 20.5
+			zIndex: o ? 21.5 : 20.5
 		}), this.rareArtBorderLeaf.set({
-			url: a ? `${this.baseImage}/art-border/art-frame-${a}.png` : "",
+			url: s ? `${this.baseImage}/art-border/art-frame-${s}.png` : "",
 			x: 117,
 			y: 322,
-			visible: !!a && !u,
+			visible: !!s && !f,
 			zIndex: 20.5
 		}), this.rarePendulumArtBorderLeaf.set({
-			url: s ? `${this.baseImage}/pendulum-frame/pframe-art-${s}.png` : "",
+			url: l ? `${this.baseImage}/pendulum-frame/pframe-art-${l}.png` : "",
 			x: 68,
 			y: 342,
-			visible: !!s && u,
+			visible: !!l && f,
 			zIndex: 20.5
 		}), this.rarePendulumEffectBorderLeaf.set({
-			url: c ? `${this.baseImage}/pendulum-frame/pframe-effect-${c}.png` : "",
+			url: u ? `${this.baseImage}/pendulum-frame/pframe-effect-${u}.png` : "",
 			x: 68,
 			y: 1256,
-			visible: !!c && u,
+			visible: !!u && f,
 			zIndex: 22
 		}), this.rareEffectBorderLeaf.set({
-			url: l ? `${this.baseImage}/effect-border/eblock-border-${l}.png` : "",
+			url: d ? `${this.baseImage}/effect-border/eblock-border-${d}.png` : "",
 			x: 77,
 			y: 1501,
-			visible: !!l && (!u || l === "grandmaster"),
+			visible: !!d && (!f || d === "grandmaster"),
 			zIndex: this.data.effectBorderStyle && this.data.effectBorderStyle !== "auto" ? 20.5 : 29
 		});
 	}
 	drawAttributeRare() {
-		this.attributeRareLeaf || (this.attributeRareLeaf = new m(), this.leafer.add(this.attributeRareLeaf));
+		this.attributeRareLeaf || (this.attributeRareLeaf = new h(), this.leafer.add(this.attributeRareLeaf));
 		let e = `${this.baseImage}/attribute/attribute-rare.png`;
 		this.attributeRareLeaf.set({
 			url: e,
@@ -652,7 +643,7 @@ var _ = {
 		});
 	}
 	drawTwentieth() {
-		this.twentiethLeaf || (this.twentiethLeaf = new m(), this.leafer.add(this.twentiethLeaf));
+		this.twentiethLeaf || (this.twentiethLeaf = new h(), this.leafer.add(this.twentiethLeaf));
 		let e = `${this.baseImage}/watermark/twentieth.png`;
 		this.twentiethLeaf.set({
 			url: e,
@@ -667,7 +658,7 @@ var _ = {
 	}
 	get style() {
 		let e = {};
-		return this.data.font ? this.data.font === "custom1" ? e = d : this.data.font === "custom2" && (e = f) : this.data.language === "sc" ? e = a : this.data.language === "tc" ? e = o : this.data.language === "jp" ? e = s : this.data.language === "kr" ? e = c : this.data.language === "en" ? e = l : (this.data.language === "astral" || this.data.language === "astral") && (e = u), e;
+		return this.data.font ? this.data.font === "custom1" ? e = f : this.data.font === "custom2" && (e = p) : this.data.language === "sc" ? e = o : this.data.language === "tc" ? e = s : this.data.language === "jp" ? e = c : this.data.language === "kr" ? e = l : this.data.language === "en" ? e = u : (this.data.language === "astral" || this.data.language === "astral") && (e = d), e;
 	}
 	get cardUrl() {
 		return this.data.type === "monster" ? `${this.baseImage}/card/card-${this.data.cardType}.png` : this.data.type === "pendulum" ? `${this.baseImage}/card/card-${this.data.pendulumType}.png` : `${this.baseImage}/card/card-${this.data.type}.png`;
@@ -732,4 +723,4 @@ var _ = {
 	}
 };
 //#endregion
-export { y as LegacyYugiohCardRenderer };
+export { b as LegacyYugiohCardRenderer };

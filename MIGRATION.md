@@ -126,6 +126,26 @@ Pendulum cards always compose the split frame resources:
 `pendulum-frame/pframe-art-base.png` stays below the foreground, while
 `pendulum-frame/pframe-effect-base.png` stays above it.
 
+## Frame Coverage And Stars
+
+Three optional flat fields (also under `frame` in structured documents) default
+to `auto` when omitted:
+
+- `cardBorderCoverForeground`: `true`, `false`, or `auto`. Auto enables outer
+  frame coverage only for the `grandmaster` rarity. Artwork borders remain below
+  the foreground, independently of this switch.
+- `levelAlign`: `left`, `center`, `right`, or `auto`. Auto aligns Xyz and
+  Xyz-Pendulum stars left, and other stars right.
+- `levelStyle`: `level`, `rank`, `level-grandmaster`, or `auto`. Auto uses rank
+  stars for Xyz, grandmaster level stars for other grandmaster cards, and ordinary
+  level stars otherwise. No grandmaster-specific rank style is provided.
+
+Explicit overrides survive changes to the card model and rarity; set a field
+back to `auto` to restore its default behavior. Star style does not change the
+count source: Xyz still uses `rank`, other monsters use `level`. Link cards render
+neither, and editors should hide both star controls for Link cards.
+`resolveFrameOptions(data)` resolves these defaults for flat-data editors.
+
 ## Node Rendering
 
 Node 22 or newer is required. Install `@leafer/node` and `skia-canvas` when

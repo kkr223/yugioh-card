@@ -1,5 +1,6 @@
 import { CompressText as e } from "../compress-text/compress-text.js";
 import { getRarityFramePreset as t, resolveRarityEffect as n } from "./rarity.js";
+import "./frame-options.js";
 import { YUGIOH_LAYER_SLOTS as r, createYugiohCardDocument as i, legacyDataToYugiohCardDocument as a, parseYugiohCardDocument as o, yugiohCardDocumentToLegacyData as s } from "./document.js";
 import { LegacyYugiohCardRenderer as c } from "./legacy-renderer.js";
 import { Box as l, Group as u, Image as d, Rect as f } from "leafer-unified";

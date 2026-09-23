@@ -1,4 +1,6 @@
 import { YugiohFrameStyle, YugiohRarityEffect } from './rarity.js';
+import { YugiohLevelAlign, YugiohLevelStyle } from './frame-options.js';
+export { YUGIOH_LEVEL_ALIGNS, YUGIOH_LEVEL_STYLES, resolveFrameOptions, type YugiohLevelAlign, type YugiohLevelStyle } from './frame-options.js';
 export { YUGIOH_RARITY_EFFECTS, resolveRarityEffect, type YugiohRarityEffect } from './rarity.js';
 export { YUGIOH_FRAME_STYLES, getRarityFramePreset, type YugiohFrameStyle } from './rarity.js';
 export declare const YUGIOH_CARD_DOCUMENT_KIND: "yugioh-card";
@@ -33,6 +35,9 @@ export interface YugiohCardDocument {
         pendulumType: YugiohPendulumCardType;
         level: number;
         rank: number;
+        levelAlign: YugiohLevelAlign;
+        levelStyle: YugiohLevelStyle;
+        cardBorderCoverForeground: boolean | 'auto';
         pendulumScale: number;
         arrows: YugiohLinkArrow[];
         nameBlock: boolean;
@@ -156,6 +161,9 @@ export interface LegacyYugiohCardData {
     pendulumType?: string;
     level?: number;
     rank?: number;
+    levelAlign?: string;
+    levelStyle?: string;
+    cardBorderCoverForeground?: boolean | 'auto';
     pendulumScale?: number;
     pendulumDescription?: string;
     monsterType?: string;
