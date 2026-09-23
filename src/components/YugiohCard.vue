@@ -35,6 +35,36 @@
               <el-option label="游戏王 2 期" value="yugioh-series-2" />
             </el-select>
           </el-form-item>
+          <template v-if="form.card === 'yugioh'">
+            <el-form-item label="外框覆盖前景图">
+              <el-switch
+                :model-value="frameOptions.cardBorderCoverForeground"
+                @change="setFrameOption('cardBorderCoverForeground', $event)"
+              />
+            </el-form-item>
+            <template v-if="frameOptions.showStars">
+              <el-form-item label="等级/阶级对齐">
+                <el-radio-group
+                  :model-value="frameOptions.levelAlign"
+                  @change="setFrameOption('levelAlign', $event)"
+                >
+                  <el-radio-button value="left">左</el-radio-button>
+                  <el-radio-button value="center">中</el-radio-button>
+                  <el-radio-button value="right">右</el-radio-button>
+                </el-radio-group>
+              </el-form-item>
+              <el-form-item label="星星样式">
+                <el-select
+                  :model-value="frameOptions.levelStyle"
+                  @change="setFrameOption('levelStyle', $event)"
+                >
+                  <el-option label="等级" value="level" />
+                  <el-option label="阶级" value="rank" />
+                  <el-option label="等级（大师）" value="level-grandmaster" />
+                </el-select>
+              </el-form-item>
+            </template>
+          </template>
           <el-form-item label="数据">
             <json-editor-vue
               v-model="jsonData"
@@ -55,8 +85,8 @@
 
 <script setup>
 import { Icon } from '@iconify/vue';
-import { onBeforeUnmount, onMounted, reactive, ref, shallowRef, watch } from 'vue';
-import { FieldCenterCard, RushDuelCard, YugiohBackCard, YugiohCard, YugiohSeries2Card } from 'yugioh-card-ts';
+import { computed, onBeforeUnmount, onMounted, reactive, ref, shallowRef, watch } from 'vue';
+import { FieldCenterCard, resolveFrameOptions, RushDuelCard, YugiohBackCard, YugiohCard, YugiohSeries2Card } from 'yugioh-card-ts';
 import JsonEditorVue from 'json-editor-vue';
 import fieldCenterDemo from '@/assets/demo/field-center-demo';
 import rushDuelDemo from '@/assets/demo/rush-duel-demo';
@@ -71,6 +101,10 @@ const form = reactive({
   data: {},
 });
 const jsonData = ref('');
+const frameOptions = computed(() => resolveFrameOptions(form.data));
+const setFrameOption = (key, value) => {
+  jsonData.value = { ...form.data, [key]: value };
+};
 const jsonOption = reactive({
   mainMenuBar: false,
   statusBar: false,
@@ -129,8 +163,12 @@ const exportImage = () => {
 
 watch(() => jsonData.value, () => {
   try {
-    form.data = JSON.parse(jsonData.value);
-    cardLeaf.value.setData(form.data);
+    const data = typeof jsonData.value === 'string' ? JSON.parse(jsonData.value) : jsonData.value;
+    if (!data || typeof data !== 'object' || Array.isArray(data)) return;
+    form.data = data;
+    cardLeaf.value.setData(form.card === 'yugioh' ? {
+      cardBorderCoverForeground: 'auto', levelAlign: 'auto', levelStyle: 'auto', ...data,
+    } : data);
   } catch {
 
   }
@@ -202,6 +240,27 @@ const toGithub = () => {
           width: 100%;
         }
       }
+    }
+  }
+}
+
+@media (max-width: 800px) {
+  .yugioh-card-container {
+    height: auto;
+    min-height: 100vh;
+    display: block;
+    overflow: visible;
+
+    .yugioh-card {
+      height: auto;
+      max-height: 65vh;
+    }
+
+    .form {
+      width: 100%;
+      height: auto;
+      border-left: 0;
+      border-top: 1px solid var(--border-color);
     }
   }
 }

@@ -11,6 +11,92 @@ import {
 
 const resourcePath = path.resolve('src/assets/yugioh-card');
 
+test('star layout supports alignment, independent styles and model defaults', async () => {
+  const card = new YugiohCard({ resourcePath, skia, data: { level: 8, rank: 4, scale: 0.1 } });
+  type StarGroup = { visible: boolean; children: Array<{ visible: boolean; x: number; width: number; url: string }> };
+  const leaves = card as unknown as { levelLeaf: StarGroup; rankLeaf: StarGroup };
+  try {
+    await card.whenReady();
+    assert.equal(leaves.levelLeaf.children[0].x, 515);
+    for (const level of [0, 1, 8, 13]) {
+      for (const levelAlign of ['left', 'center', 'right']) {
+        card.setData({ level, levelAlign, levelStyle: 'level-grandmaster' });
+        await card.whenReady();
+        const stars = leaves.levelLeaf.children.filter(star => star.visible);
+        assert.equal(stars.length, level);
+        if (!level) continue;
+        const width = level * 92 - 4;
+        const margin = level < 13 ? 147 : 101;
+        const left = levelAlign === 'left' ? margin
+          : levelAlign === 'center' ? (1394 - width) / 2 : 1394 - margin - width;
+        assert.equal(stars[0].x, left);
+        assert.equal(stars.at(-1)!.x + 88, left + width);
+        assert.match(stars[0].url, /level-grandmaster\.png$/);
+      }
+    }
+    card.setData({ cardType: 'xyz', levelAlign: 'auto', levelStyle: 'auto' });
+    await card.whenReady();
+    assert.equal(leaves.levelLeaf.visible, false);
+    assert.equal(leaves.rankLeaf.visible, true);
+    assert.equal(leaves.rankLeaf.children.filter(star => star.visible).length, 4);
+    assert.equal(leaves.rankLeaf.children[0].x, 147);
+    assert.match(leaves.rankLeaf.children[0].url, /rank\.png$/);
+    card.setData({ levelStyle: 'level', levelAlign: 'center' });
+    await card.whenReady();
+    assert.equal(leaves.rankLeaf.children[0].x, 515);
+    assert.match(leaves.rankLeaf.children[0].url, /level\.png$/);
+    for (const type of ['monster', 'pendulum']) {
+      card.setData({ type, cardType: 'link', pendulumType: 'link-pendulum' });
+      await card.whenReady();
+      assert.equal(leaves.levelLeaf.visible, false);
+      assert.equal(leaves.rankLeaf.visible, false);
+    }
+    card.setData({ type: 'monster', cardType: 'normal', rare: 'grandmaster', levelStyle: 'auto', levelAlign: 'auto' });
+    await card.whenReady();
+    assert.match(leaves.levelLeaf.children[0].url, /level-grandmaster\.png$/);
+  } finally {
+    card.destroy();
+  }
+});
+
+test('outer border coverage changes edge pixels without covering the foreground center', async () => {
+  const foreground = new skia.Canvas(1, 1);
+  const context = foreground.getContext('2d');
+  context.fillStyle = '#ff0000';
+  context.fillRect(0, 0, 1, 1);
+  const card = new YugiohCard({ resourcePath, skia, data: {
+    scale: 0.2, foregroundImage: await foreground.toDataURL('png'),
+    foregroundWidth: 1394, foregroundHeight: 2031, foregroundX: 697, foregroundY: 1015.5,
+  } });
+  const leaves = card as unknown as Record<string, { zIndex: number; visible: boolean }>;
+  async function sample(x: number) {
+    const exported = await card.export('png', { density: 1 }) as { data: string };
+    const image = await skia.loadImage(exported.data);
+    const canvas = new skia.Canvas(image.width, image.height);
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(image, 0, 0);
+    return [...ctx.getImageData(Math.floor(x * image.width / 1394), Math.floor(1000 * image.height / 2031), 1, 1).data];
+  }
+  try {
+    for (const rare of ['', 'o', 'grandmaster']) {
+      card.setData({ rare, cardBorderCoverForeground: false });
+      await card.whenReady();
+      assert.deepEqual(await sample(20), [255, 0, 0, 255]);
+      card.setData({ cardBorderCoverForeground: true });
+      await card.whenReady();
+      assert.notDeepEqual(await sample(20), [255, 0, 0, 255]);
+      assert.deepEqual(await sample(700), [255, 0, 0, 255]);
+      assert.ok(leaves[rare ? 'rareCardBorderLeaf' : 'defaultCardBorderLeaf'].zIndex > leaves.foregroundClipBox.zIndex);
+      assert.ok(leaves.rareArtBorderLeaf.zIndex < leaves.foregroundClipBox.zIndex);
+      card.setData({ cardBorderCoverForeground: 'auto' });
+      await card.whenReady();
+      assert.equal((await sample(20))[0] === 255, rare !== 'grandmaster');
+    }
+  } finally {
+    card.destroy();
+  }
+});
+
 test('coalesces document updates and exports the stable revision', async () => {
   let extensionUpdates = 0;
   let extensionDestroyed = 0;

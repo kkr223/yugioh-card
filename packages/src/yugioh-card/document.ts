@@ -1,4 +1,6 @@
 import { YUGIOH_FRAME_STYLES, YUGIOH_RARITY_EFFECTS, type YugiohFrameStyle, type YugiohRarityEffect } from './rarity.ts';
+import { YUGIOH_LEVEL_ALIGNS, YUGIOH_LEVEL_STYLES, type YugiohLevelAlign, type YugiohLevelStyle } from './frame-options.ts';
+export { YUGIOH_LEVEL_ALIGNS, YUGIOH_LEVEL_STYLES, resolveFrameOptions, type YugiohLevelAlign, type YugiohLevelStyle } from './frame-options.ts';
 export { YUGIOH_RARITY_EFFECTS, resolveRarityEffect, type YugiohRarityEffect } from './rarity.ts';
 export { YUGIOH_FRAME_STYLES, getRarityFramePreset, type YugiohFrameStyle } from './rarity.ts';
 
@@ -69,6 +71,9 @@ export interface YugiohCardDocument {
     pendulumType: YugiohPendulumCardType;
     level: number;
     rank: number;
+    levelAlign: YugiohLevelAlign;
+    levelStyle: YugiohLevelStyle;
+    cardBorderCoverForeground: boolean | 'auto';
     pendulumScale: number;
     arrows: YugiohLinkArrow[];
     nameBlock: boolean;
@@ -193,6 +198,9 @@ export interface LegacyYugiohCardData {
   pendulumType?: string;
   level?: number;
   rank?: number;
+  levelAlign?: string;
+  levelStyle?: string;
+  cardBorderCoverForeground?: boolean | 'auto';
   pendulumScale?: number;
   pendulumDescription?: string;
   monsterType?: string;
@@ -285,6 +293,9 @@ const DEFAULT_DOCUMENT: YugiohCardDocument = {
     pendulumType: 'normal-pendulum',
     level: 0,
     rank: 0,
+    levelAlign: 'auto',
+    levelStyle: 'auto',
+    cardBorderCoverForeground: 'auto',
     pendulumScale: 0,
     arrows: [],
     nameBlock: false,
@@ -543,6 +554,10 @@ export function parseYugiohCardDocument(value: unknown): YugiohCardDocument {
       ),
       level: numberAt(frame.level, 'frame.level'),
       rank: numberAt(frame.rank, 'frame.rank'),
+      levelAlign: optionalEnumAt(frame.levelAlign, YUGIOH_LEVEL_ALIGNS, 'auto', 'frame.levelAlign'),
+      levelStyle: optionalEnumAt(frame.levelStyle, YUGIOH_LEVEL_STYLES, 'auto', 'frame.levelStyle'),
+      cardBorderCoverForeground: frame.cardBorderCoverForeground === undefined || frame.cardBorderCoverForeground === 'auto'
+        ? 'auto' : booleanAt(frame.cardBorderCoverForeground, 'frame.cardBorderCoverForeground'),
       pendulumScale: numberAt(frame.pendulumScale, 'frame.pendulumScale'),
       arrows: [...arrows] as YugiohLinkArrow[],
       nameBlock: optionalBooleanAt(frame.nameBlock, false, 'frame.nameBlock'),
@@ -765,6 +780,11 @@ export function legacyDataToYugiohCardDocument(
       ),
       level: numberValue(data.level, base.frame.level),
       rank: numberValue(data.rank, base.frame.rank),
+      levelAlign: enumValue(data.levelAlign, YUGIOH_LEVEL_ALIGNS, base.frame.levelAlign),
+      levelStyle: enumValue(data.levelStyle, YUGIOH_LEVEL_STYLES, base.frame.levelStyle),
+      cardBorderCoverForeground: data.cardBorderCoverForeground === 'auto'
+        ? 'auto' : typeof data.cardBorderCoverForeground === 'boolean'
+          ? data.cardBorderCoverForeground : base.frame.cardBorderCoverForeground,
       pendulumScale: numberValue(data.pendulumScale, base.frame.pendulumScale),
       arrows,
       cardBorderStyle: enumValue(data.cardBorderStyle, YUGIOH_FRAME_STYLES, base.frame.cardBorderStyle),
@@ -961,6 +981,9 @@ export function yugiohCardDocumentToLegacyData(
     pendulumType: value.frame.pendulumType,
     level: value.frame.level,
     rank: value.frame.rank,
+    levelAlign: value.frame.levelAlign,
+    levelStyle: value.frame.levelStyle,
+    cardBorderCoverForeground: value.frame.cardBorderCoverForeground,
     pendulumScale: value.frame.pendulumScale,
     nameBlock: value.frame.nameBlock,
     cardBorderStyle: value.frame.cardBorderStyle,

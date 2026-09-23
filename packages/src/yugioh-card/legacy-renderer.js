@@ -11,6 +11,7 @@ import astralStyle from './style/astral-style.ts';
 import custom1Style from './style/custom1-style.ts';
 import custom2Style from './style/custom2-style.ts';
 import { getRarityFramePreset, resolveRarityEffect } from './rarity.ts';
+import { resolveFrameOptions } from './frame-options.ts';
 
 const HR_EFFECT_SOURCE_FRAME = { x: 170, y: 375, width: 1054, height: 1054 };
 const HR_EFFECT_PENDULUM_FRAME = { x: 94, y: 364, width: 1205, height: 900 };
@@ -36,6 +37,7 @@ export class LegacyYugiohCardRenderer extends Card {
   laserLeaf = null;
   rareLeaf = null;
   rareCardBorderLeaf = null;
+  defaultCardBorderLeaf = null;
   rareArtBorderLeaf = null;
   rarePendulumArtBorderLeaf = null;
   rarePendulumEffectBorderLeaf = null;
@@ -177,60 +179,39 @@ export class LegacyYugiohCardRenderer extends Card {
   }
 
   drawLevel() {
-    if (!this.levelLeaf) {
-      this.levelLeaf = new Group();
-      for (let i = 0; i < 13; i++) {
-        const level = new Image();
-        this.levelLeaf.add(level);
-      }
-      this.leafer.add(this.levelLeaf);
-    }
-
-    const levelUrl = `${this.baseImage}/level/level.png`;
-    const levelWidth = 88;
-    const right = this.data.level < 13 ? 147 : 101;
-    this.levelLeaf.children.forEach((level, index) => {
-      level.set({
-        url: levelUrl,
-        x: this.cardWidth - right - index * (levelWidth + 4),
-        y: 247,
-        around: { type: 'percent', x: 1, y: 0 },
-        visible: index < this.data.level,
-      });
-    });
-
-    this.levelLeaf.set({
-      visible: this.showLevel,
-      zIndex: 10,
-    });
+    this.drawStars('levelLeaf', this.data.level, this.showLevel);
   }
 
   drawRank() {
-    if (!this.rankLeaf) {
-      this.rankLeaf = new Group();
-      for (let i = 0; i < 13; i++) {
-        const rank = new Image();
-        this.rankLeaf.add(rank);
-      }
-      this.leafer.add(this.rankLeaf);
-    }
+    this.drawStars('rankLeaf', this.data.rank, this.showRank);
+  }
 
-    const rankUrl = `${this.baseImage}/level/rank.png`;
-    const rankWidth = 88;
-    const left = this.data.rank < 13 ? 147 : 101;
-    this.rankLeaf.children.forEach((rank, index) => {
-      rank.set({
-        url: rankUrl,
-        x: left + index * (rankWidth + 4),
+  drawStars(key, count, visible) {
+    if (!this[key]) {
+      this[key] = new Group();
+      for (let i = 0; i < 13; i++) {
+        this[key].add(new Image());
+      }
+      this.leafer.add(this[key]);
+    }
+    const { levelAlign, levelStyle } = resolveFrameOptions(this.data);
+    const size = Math.min(13, Math.max(0, Math.ceil(count)));
+    const width = Math.max(0, size * 92 - 4);
+    const margin = size < 13 ? 147 : 101;
+    const left = levelAlign === 'left' ? margin
+      : levelAlign === 'center' ? (this.cardWidth - width) / 2
+        : this.cardWidth - margin - width;
+    this[key].children.forEach((star, index) => {
+      star.set({
+        url: `${this.baseImage}/level/${levelStyle}.png`,
+        x: left + index * 92,
         y: 247,
-        visible: index < this.data.rank,
+        width: 88,
+        height: 88,
+        visible: index < size,
       });
     });
-
-    this.rankLeaf.set({
-      visible: this.showRank,
-      zIndex: 10,
-    });
+    this[key].set({ visible, zIndex: 10 });
   }
 
   drawSpellTrap() {
@@ -742,6 +723,20 @@ export class LegacyYugiohCardRenderer extends Card {
       if (this.data[key] && this.data[key] !== 'auto') frames[key] = this.data[key];
     }
     const cardBorder = frames.cardBorderStyle === 'default' ? '' : frames.cardBorderStyle;
+    const { cardBorderCoverForeground } = resolveFrameOptions(this.data);
+    // Recover the base outer border from the card texture using the shared border silhouette.
+    if (!this.defaultCardBorderLeaf && !cardBorder && cardBorderCoverForeground) {
+      this.defaultCardBorderLeaf = new Group();
+      this.defaultCardBorderLeaf.add(new Image({
+        url: `${this.baseImage}/card-border/card-border-silver.png`, mask: 'alpha',
+      }));
+      this.defaultCardBorderLeaf.add(new Image());
+      this.leafer.add(this.defaultCardBorderLeaf);
+    }
+    if (this.defaultCardBorderLeaf) {
+      this.defaultCardBorderLeaf.children[1].set({ url: this.cardUrl, cornerRadius: this.data.radius ? 24 : 0 });
+      this.defaultCardBorderLeaf.set({ visible: !cardBorder && cardBorderCoverForeground, zIndex: 21.5 });
+    }
     const artBorder = frames.artBorderStyle === 'default' ? ''
       : frames.artBorderStyle === 'grandmaster' ? 'color' : frames.artBorderStyle;
     const pendulumStyle = style => style === 'silver' ? 'sliver' : style === 'grandmaster' ? 'color' : style;
@@ -776,7 +771,7 @@ export class LegacyYugiohCardRenderer extends Card {
         : '',
       cornerRadius: this.data.radius ? 24 : 0,
       visible: Boolean(cardBorder),
-      zIndex: 20.5,
+      zIndex: cardBorderCoverForeground ? 21.5 : 20.5,
     });
     this.rareArtBorderLeaf.set({
       url: artBorder
